@@ -27,21 +27,25 @@ pub fn xch_try(
     list: &Vec<Vec<i32>>,
     chmcl_f_sut: &ChemicalEquation,
     len: usize,
-) -> bool {
+) -> Result<bool, String> {
     if f == chmcl_f_sut.sum + 1 {
-        if check(traversal, list, chmcl_f_sut, len) == true {
-            return true;
+        match check(traversal, list, chmcl_f_sut, len) {
+            Ok(true) => return Ok(true),
+            Err(s) => return Err(s),
+            _ => (),
         }
     } else {
         for i in 1..searching_range + 1 {
             traversal.push(i);
-            if xch_try(f + 1, searching_range, traversal, list, chmcl_f_sut, len) == true {
-                return true;
+            match xch_try(f + 1, searching_range, traversal, list, chmcl_f_sut, len) {
+                Ok(true) => return Ok(true),
+                Err(s) => return Err(s),
+                _ => (),
             }
             traversal.pop();
         }
     }
-    false
+    Ok(false)
 }
 
 fn check(
@@ -49,7 +53,7 @@ fn check(
     list: &Vec<Vec<i32>>,
     chmcl_f_sut: &ChemicalEquation,
     len: usize,
-) -> bool {
+) -> Result<bool, String> {
     let mut tmp1: i32;
     let mut tmp2: i32;
     for i in 1..len + 1 {
@@ -57,21 +61,29 @@ fn check(
         tmp2 = 0;
         for j in 1..chmcl_f_sut.left_num as usize + 1 {
             let tmp: i32;
-            tmp = list[i][j]
-                .checked_mul(traversal[j - 1])
-                .expect("[ERROR] i32 overflow");
-            tmp1 = tmp1.checked_add(tmp).expect("[ERROR] i32 overflow");
+            tmp = match list[i][j].checked_mul(traversal[j - 1]) {
+                Some(s) => s,
+                None => return Err("[ERROR] i32 overflow".to_string()),
+            };
+            tmp1 = match tmp1.checked_add(tmp) {
+                Some(s) => s,
+                None => return Err("[ERROR] i32 overflow".to_string()),
+            };
         }
         for j in chmcl_f_sut.left_num as usize + 1..chmcl_f_sut.sum as usize + 1 {
             let tmp: i32;
-            tmp = list[i][j]
-                .checked_mul(traversal[j - 1])
-                .expect("[ERROR] i32 overflow");
-            tmp2 = tmp2.checked_add(tmp).expect("[ERROR] i32 overflow");
+            tmp = match list[i][j].checked_mul(traversal[j - 1]) {
+                Some(s) => s,
+                None => return Err("[ERROR] i32 overflow".to_string()),
+            };
+            tmp2 = match tmp2.checked_add(tmp) {
+                Some(s) => s,
+                None => return Err("[ERROR] i32 overflow".to_string()),
+            };
         }
         if tmp1 != tmp2 {
-            return false;
+            return Ok(false);
         }
     }
-    true
+    Ok(true)
 }

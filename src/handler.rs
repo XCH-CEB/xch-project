@@ -19,21 +19,29 @@ use balancer_mod::xch_try;
 
 /// the API balances the Chemical Equation by equation and searching range.
 /// If the equation can balance, function would return a `i32` vector which contains the answer.
-/// If not, it would return a `Vec<Vec<i32>>` which contains Delta-3 the parser's result.
+/// If not, it would return `handler::ErrorHandler` which contains Delta-3 the parser's result and error message.
 ///
 /// # Panics
 ///
 /// The equation you provided should be a common unbalanced chemical equation which only contains **one** `+`.
 /// In following cases, API will **panic**:
-/// 1.Contians illegal chars. Equation should only contain `+`, `=`, letters, numbers.
-/// 2.Contians **more than one** `=`.
-/// 3.Unmatched `(` and `)`.
-/// 4.Several kinds of `i32 overflow`.
-/// 5.Stack Overflow may cause panic too. Because we are using recusive balancer and regex-based parser.
-pub fn handler_api(equation: String, searching_range: i32) -> Result<Vec<i32>, Vec<Vec<i32>>> {
+/// 1.Stack Overflow may cause panic too. Because it is using recusive balancer and regex-based parser.
+/// And in the other failed situation, it'll return a `error_message` and contain `parser_result`(maybe it is empty).
+pub fn handler_api(equation: String, searching_range: i32) -> Result<Vec<i32>, ErrorHandler> {
     // T is successful traversal vector, E is list vector which parser returned.
     let mut traversal: Vec<i32> = Vec::new();
-    let (chemical_equation_struct, elements_table, list) = xch_parser(equation);
+    let (chemical_equation_struct, elements_table, list) = match xch_parser(equation) {
+        Ok(some) => some,
+        Err(e) => {
+            return Err(ErrorHandler {
+                error_message: e,
+                parser_result: {
+                    let list: Vec<Vec<i32>> = Vec::new();
+                    list
+                },
+            })
+        }
+    };
     match xch_try(
         1,
         searching_range,
@@ -42,7 +50,21 @@ pub fn handler_api(equation: String, searching_range: i32) -> Result<Vec<i32>, V
         &chemical_equation_struct,
         elements_table.len(),
     ) {
-        true => Ok(traversal),
-        false => Err(list),
+        Ok(true) => Ok(traversal),
+        Ok(false) => Err(ErrorHandler {
+            error_message: "No answer".to_string(),
+            parser_result: list,
+        }),
+        Err(s) => Err(ErrorHandler {
+            error_message: s,
+            parser_result: list,
+        }),
     }
+}
+
+/// ErrorHandler returns when `handler::handler_api` failed somehow.
+/// **CAUTION: parser_result might empty if parser is failed.**
+pub struct ErrorHandler {
+    pub error_message: String,
+    pub parser_result: Vec<Vec<i32>>,
 }

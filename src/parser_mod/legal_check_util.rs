@@ -13,32 +13,34 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-pub fn legal_check(equation: &String) {
+pub fn legal_check(equation: &String) -> Result<bool, String> {
     let equation = equation.chars().into_iter().collect::<Vec<_>>();
     let mut tmp = 0;
     for i in equation {
         if check_char(i) == 0 {
-            panic!("[ERROR] Illegal Equation!");
+            return Err("[ERROR] Illegal Equation!".to_string());
         }
         if i == '=' {
             tmp = tmp + 1;
         }
     }
     if tmp != 1 {
-        panic!("[ERROR] Illegal Equation!");
+        return Err("[ERROR] Illegal Equation!".to_string());
     }
+    Ok(true)
 }
 
-pub fn legal_check_brackets(formula: &String) {
+pub fn legal_check_brackets(formula: &String) -> Result<bool, String> {
     let formula = formula.chars().into_iter().collect::<Vec<_>>();
     for i in 0..formula.len() {
         if formula[i] == '(' {
-            brackets_matcher(&formula, i, true).expect("[ERROR] Illegal Equation!");
+            brackets_matcher(&formula, i, true)?;
         }
         if formula[i] == ')' {
-            brackets_matcher(&formula, i, false).expect("[ERROR] Illegal Equation!");
+            brackets_matcher(&formula, i, false)?;
         }
     }
+    Ok(true)
 }
 
 fn brackets_matcher(formula: &Vec<char>, pos: usize, mode: bool) -> Result<usize, String> {
@@ -65,16 +67,14 @@ fn brackets_matcher(formula: &Vec<char>, pos: usize, mode: bool) -> Result<usize
             }
             if formula[i] == '(' {
                 if fake_stack == 0 {
-                    let x: Result<usize, String> = Ok(i);
-                    return x;
+                    return Ok(i);
                 } else {
                     fake_stack = fake_stack - 1;
                 }
             }
         }
     }
-    let x: Result<usize, String> = Err("[ERROR] Can't match!".to_string());
-    x
+    Err("[ERROR] Can't match!".to_string())
 }
 
 fn check_char(test: char) -> i32 {
