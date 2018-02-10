@@ -38,9 +38,9 @@ pub struct TableDesc {
 }
 
 impl TableDesc {
-    pub fn store_in_table(&mut self, formula: &String, location: usize) -> Result<bool, String> {
+    pub fn store_in_table(&mut self, formula: &str, location: usize) -> Result<bool, String> {
         for t in get_token(formula)? {
-            if self.find_element_in_table(&t.token_name).is_ok() == false {
+            if !self.find_element_in_table(&t.token_name).is_ok() {
                 let len = self.elements_table.len();
                 self.elements_table.push(ElementStruct {
                     name: t.token_name.clone(),
@@ -69,7 +69,8 @@ impl TableDesc {
         (self.list).to_vec()
     }
 
-    pub fn new(sum: i32) -> Self { // PLEASE call update_list_vec after new!
+    pub fn new(sum: i32) -> Self {
+        // PLEASE call update_list_vec after new!
         Self {
             elements_table: Vec::new(),
             list: Vec::new(),
@@ -90,7 +91,7 @@ impl TableDesc {
         v
     }
 
-    fn find_element_in_table(&self, target: &String) -> Result<usize, String> {
+    fn find_element_in_table(&self, target: &str) -> Result<usize, String> {
         for i in &(self.elements_table) {
             if i.name == *target {
                 return Ok(i.num);

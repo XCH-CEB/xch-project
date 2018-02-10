@@ -15,18 +15,18 @@
 
 use lib_xch::handler::handler_api;
 
-pub fn tester(equ: &str, range: i32, v: Vec<i32>) {
-    let foo = match handler_api(equ.to_string(), range) {
+pub fn tester(equ: &str, range: i32, v: &[i32]) {
+    let tmp = match handler_api(equ, range) {
         Ok(v) => v,
-        Err(_) => panic!("Failed!"),
+        Err(_e) => panic!("Failed!"),
     };
-    assert_eq!(foo, v);
+    assert_eq!(tmp, v);
 }
 
 pub fn tester_error(equ: &str, range: i32, err: &str) {
-    let foo = match handler_api(equ.to_string(), range) {
+    let tmp = match handler_api(equ, range) {
         Ok(_) => panic!("Failed!"),
         Err(s) => s.error_message,
     };
-    assert_eq!(foo, err.to_string());
+    assert_eq!(tmp, err.to_string());
 }

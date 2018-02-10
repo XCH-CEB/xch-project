@@ -17,21 +17,21 @@ extern crate lib_xch;
 
 mod testers;
 
-use testers::{tester,tester_error};
+use testers::{tester, tester_error};
 
 #[test]
 fn simples() {
-    tester("H2O=H2+O2", 10, vec![2, 2, 1]);
+    tester("H2O=H2+O2", 10, &[2, 2, 1]);
 }
 
 #[test]
 fn high_performance() {
-    tester("As2O3+Zn+HCl=AsH3+ZnCl2+H2O", 50, vec![1, 6, 12, 2, 6, 3]);
+    tester("As2O3+Zn+HCl=AsH3+ZnCl2+H2O", 50, &[1, 6, 12, 2, 6, 3]);
 }
 
 #[test]
 fn brackets() {
-    tester("O2(O3(O)4O5(O))=O", 50, vec![1, 15]);
+    tester("O2(O3(O)4O5(O))=O", 50, &[1, 15]);
 }
 
 #[test]

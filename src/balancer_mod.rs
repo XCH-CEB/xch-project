@@ -24,7 +24,7 @@ pub fn xch_try(
     f: i32,
     searching_range: i32,
     traversal: &mut Vec<i32>,
-    list: &Vec<Vec<i32>>,
+    list: &[Vec<i32>],
     chmcl_f_sut: &ChemicalEquation,
     len: usize,
 ) -> Result<bool, String> {
@@ -50,18 +50,18 @@ pub fn xch_try(
 
 fn check(
     traversal: &mut Vec<i32>,
-    list: &Vec<Vec<i32>>,
+    list: &[Vec<i32>],
     chmcl_f_sut: &ChemicalEquation,
     len: usize,
 ) -> Result<bool, String> {
     let mut tmp1: i32;
     let mut tmp2: i32;
-    for i in 1..len + 1 {
+    for item in list.iter().take(len + 1).skip(1) {
         tmp1 = 0;
         tmp2 = 0;
         for j in 1..chmcl_f_sut.left_num as usize + 1 {
             let tmp: i32;
-            tmp = match list[i][j].checked_mul(traversal[j - 1]) {
+            tmp = match item[j].checked_mul(traversal[j - 1]) {
                 Some(s) => s,
                 None => return Err("[ERROR] i32 overflow".to_string()),
             };
@@ -72,7 +72,7 @@ fn check(
         }
         for j in chmcl_f_sut.left_num as usize + 1..chmcl_f_sut.sum as usize + 1 {
             let tmp: i32;
-            tmp = match list[i][j].checked_mul(traversal[j - 1]) {
+            tmp = match item[j].checked_mul(traversal[j - 1]) {
                 Some(s) => s,
                 None => return Err("[ERROR] i32 overflow".to_string()),
             };

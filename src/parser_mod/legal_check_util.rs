@@ -15,7 +15,7 @@
 
 // Overall: This is the source code of the Delta-3 Parser.
 
-pub fn legal_check(equation: &String) -> Result<bool, String> {
+pub fn legal_check(equation: &str) -> Result<bool, String> {
     let equation = equation.chars().into_iter().collect::<Vec<_>>();
     let mut tmp = 0;
     for i in equation {
@@ -23,7 +23,7 @@ pub fn legal_check(equation: &String) -> Result<bool, String> {
             return Err("[ERROR] Illegal Equation!".to_string());
         }
         if i == '=' {
-            tmp = tmp + 1;
+            tmp += 1;
         }
     }
     if tmp != 1 {
@@ -32,7 +32,7 @@ pub fn legal_check(equation: &String) -> Result<bool, String> {
     Ok(true)
 }
 
-pub fn legal_check_brackets(formula: &String) -> Result<bool, String> {
+pub fn legal_check_brackets(formula: &str) -> Result<bool, String> {
     let formula = formula.chars().into_iter().collect::<Vec<_>>();
     for i in 0..formula.len() {
         if formula[i] == '(' {
@@ -45,32 +45,32 @@ pub fn legal_check_brackets(formula: &String) -> Result<bool, String> {
     Ok(true)
 }
 
-fn brackets_matcher(formula: &Vec<char>, pos: usize, mode: bool) -> Result<usize, String> {
+fn brackets_matcher(formula: &[char], pos: usize, mode: bool) -> Result<usize, String> {
     let mut fake_stack = 0;
 
-    if mode == true {
-        for i in pos + 1..formula.len() {
-            if formula[i] == '(' {
-                fake_stack = fake_stack + 1;
+    if mode {
+        for (i, item) in formula.iter().enumerate().skip(pos + 1) {
+            if *item == '(' {
+                fake_stack += 1;
             }
-            if formula[i] == ')' {
+            if *item == ')' {
                 if fake_stack == 0 {
                     return Ok(i);
                 } else {
-                    fake_stack = fake_stack - 1;
+                    fake_stack -= 1;
                 }
             }
         }
     } else {
         for i in (0..pos).rev() {
             if formula[i] == ')' {
-                fake_stack = fake_stack + 1;
+                fake_stack += 1;
             }
             if formula[i] == '(' {
                 if fake_stack == 0 {
                     return Ok(i);
                 } else {
-                    fake_stack = fake_stack - 1;
+                    fake_stack -= 1;
                 }
             }
         }
@@ -80,16 +80,16 @@ fn brackets_matcher(formula: &Vec<char>, pos: usize, mode: bool) -> Result<usize
 
 fn check_char(test: char) -> i32 {
     if (test >= 'a') && (test <= 'z') {
-        return 1; // 'a'~'z'
+        1 // 'a'~'z'
     } else if (test >= 'A') && (test <= 'Z') {
-        return 2; // 'A'~'Z'
+        2 // 'A'~'Z'
     } else if (test >= '0') && (test <= '9') {
-        return 3; // '0'~'9'
+        3 // '0'~'9'
     } else if (test == '(') || (test <= ')') {
-        return 4; // ( or )
+        4 // ( or )
     } else if (test == '+') || (test == '=') {
-        return 5; // + or =
+        5 // + or =
     } else {
-        return 0; // nothing!
+        0 // nothing!
     }
 }

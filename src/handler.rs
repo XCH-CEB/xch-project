@@ -27,7 +27,7 @@ use balancer_mod::xch_try;
 /// In following cases, API will **panic**:
 /// 1.Stack Overflow may cause panic too. Because it is using recusive balancer and regex-based parser.
 /// And in the other failed situation, it'll return a `error_message` and contain `parser_result`(maybe it is empty).
-pub fn handler_api(equation: String, searching_range: i32) -> Result<Vec<i32>, ErrorHandler> {
+pub fn handler_api(equation: &str, searching_range: i32) -> Result<Vec<i32>, ErrorHandler> {
     // T is successful traversal vector, E is list vector which parser returned.
     let mut traversal: Vec<i32> = Vec::new();
     let (chemical_equation_struct, elements_table_len, list) = match xch_parser(equation) {
@@ -62,8 +62,8 @@ pub fn handler_api(equation: String, searching_range: i32) -> Result<Vec<i32>, E
     }
 }
 
-/// ErrorHandler returns when `handler::handler_api` failed somehow.
-/// **CAUTION: parser_result might empty if parser is failed.**
+/// `ErrorHandler` returns when `handler::handler_api` failed somehow.
+/// **CAUTION: `parser_result` might empty if parser is failed.**
 pub struct ErrorHandler {
     pub error_message: String,
     pub parser_result: Vec<Vec<i32>>,
