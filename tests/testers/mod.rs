@@ -13,12 +13,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-// extern crate(s)
-#[macro_use] extern crate lazy_static;
-extern crate regex;
+use lib_xch::handler::handler_api;
 
-// mods
-pub mod handler;
-mod parser_mod;
-mod balancer_mod;
-mod structs;
+pub fn tester(equ: &str, range: i32, v: Vec<i32>) {
+    let foo = match handler_api(equ.to_string(), range) {
+        Ok(v) => v,
+        Err(_) => panic!("Failed!"),
+    };
+    assert_eq!(foo, v);
+}
+
+pub fn tester_error(equ: &str, range: i32, err: &str) {
+    let foo = match handler_api(equ.to_string(), range) {
+        Ok(_) => panic!("Failed!"),
+        Err(s) => s.error_message,
+    };
+    assert_eq!(foo, err.to_string());
+}

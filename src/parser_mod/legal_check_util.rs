@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+// Overall: This is the source code of the Delta-3 Parser.
+
 pub fn legal_check(equation: &String) -> Result<bool, String> {
     let equation = equation.chars().into_iter().collect::<Vec<_>>();
     let mut tmp = 0;
@@ -53,8 +55,7 @@ fn brackets_matcher(formula: &Vec<char>, pos: usize, mode: bool) -> Result<usize
             }
             if formula[i] == ')' {
                 if fake_stack == 0 {
-                    let x: Result<usize, String> = Ok(i);
-                    return x;
+                    return Ok(i);
                 } else {
                     fake_stack = fake_stack - 1;
                 }

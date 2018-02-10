@@ -30,7 +30,7 @@ use balancer_mod::xch_try;
 pub fn handler_api(equation: String, searching_range: i32) -> Result<Vec<i32>, ErrorHandler> {
     // T is successful traversal vector, E is list vector which parser returned.
     let mut traversal: Vec<i32> = Vec::new();
-    let (chemical_equation_struct, elements_table, list) = match xch_parser(equation) {
+    let (chemical_equation_struct, elements_table_len, list) = match xch_parser(equation) {
         Ok(some) => some,
         Err(e) => {
             return Err(ErrorHandler {
@@ -48,7 +48,7 @@ pub fn handler_api(equation: String, searching_range: i32) -> Result<Vec<i32>, E
         &mut traversal,
         &list,
         &chemical_equation_struct,
-        elements_table.len(),
+        elements_table_len,
     ) {
         Ok(true) => Ok(traversal),
         Ok(false) => Err(ErrorHandler {
