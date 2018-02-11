@@ -18,7 +18,7 @@ use lib_xch::handler::handler_api;
 pub fn tester(equ: &str, range: i32, v: &[i32]) {
     let tmp = match handler_api(equ, range) {
         Ok(v) => v,
-        Err(_e) => panic!("Failed!"),
+        Err(e) => panic!(e),
     };
     assert_eq!(tmp, v);
 }
