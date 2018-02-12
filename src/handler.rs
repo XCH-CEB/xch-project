@@ -23,9 +23,10 @@ use balancer_mod::xch_try;
 ///
 /// # Panics
 ///
-/// The equation you provided should be a common unbalanced chemical equation which only contains **one** `+`.
-/// In following cases, API will **panic**:
-/// 1.Stack Overflow may cause panic too. Because it is using recusive balancer and regex-based parser.
+/// The equation you provided should be a common unbalanced chemical equation which only contains **one** `=`.
+///
+/// -  Stack Overflow may cause **panic**. Because it is using recusive balancer and regex-based parser.
+///
 /// And in the other failed situation, it'll return a `error_message` and contain `parser_result`(maybe it is empty).
 pub fn handler_api(equation: &str, searching_range: i32) -> Result<Vec<i32>, ErrorHandler> {
     // T is successful traversal vector, E is list vector which parser returned.
@@ -52,7 +53,7 @@ pub fn handler_api(equation: &str, searching_range: i32) -> Result<Vec<i32>, Err
     ) {
         Ok(true) => Ok(traversal),
         Ok(false) => Err(ErrorHandler {
-            error_message: "No answer".to_string(),
+            error_message: ErrorCases::NoAnswer,
             parser_result: list,
         }),
         Err(s) => Err(ErrorHandler {
@@ -65,6 +66,28 @@ pub fn handler_api(equation: &str, searching_range: i32) -> Result<Vec<i32>, Err
 /// `ErrorHandler` returns when `handler::handler_api` failed somehow.
 /// **CAUTION: `parser_result` might empty if parser is failed.**
 pub struct ErrorHandler {
-    pub error_message: String,
+    pub error_message: ErrorCases,
     pub parser_result: Vec<Vec<i32>>,
+}
+
+/// All the Error Types.
+///
+/// -  more or less than 1 `=`; not allowed chars; too many formulas.
+/// -  i32 overflow.
+/// -  brackets are not matched.
+/// -  no formulas to split.
+/// -  no tokens to get.
+/// -  not found in `elements_table`.
+/// -  no answer.
+/// -  Can't parse into i32.
+#[derive(PartialEq, Debug)]
+pub enum ErrorCases {
+    IllegalEquation,
+    I32Overflow,
+    MatchError,
+    SplitError,
+    NoTokens,
+    NotFound,
+    NoAnswer,
+    I32ParseError,
 }

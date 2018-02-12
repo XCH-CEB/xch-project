@@ -27,8 +27,10 @@ use std::i32;
 use structs::ChemicalEquation;
 use self::parser_struct::{FormulaDesc, TableDesc, TokenDesc};
 use self::legal_check_util::{legal_check, legal_check_brackets};
+use handler::ErrorCases;
+use handler::ErrorCases::{I32Overflow, I32ParseError, IllegalEquation, NoTokens, SplitError};
 
-pub fn xch_parser(equation: &str) -> Result<(ChemicalEquation, usize, Vec<Vec<i32>>), String> {
+pub fn xch_parser(equation: &str) -> Result<(ChemicalEquation, usize, Vec<Vec<i32>>), ErrorCases> {
     legal_check(equation)?;
     let mut chemical_equation_struct = ChemicalEquation {
         left_num: 0,
@@ -68,18 +70,18 @@ pub fn xch_parser(equation: &str) -> Result<(ChemicalEquation, usize, Vec<Vec<i3
     ))
 }
 
-fn parser_get_sum(equation: &str) -> Result<i32, String> {
+fn parser_get_sum(equation: &str) -> Result<i32, ErrorCases> {
     let mut sum: i32 = 0;
     for _ in equation.split('+') {
         sum = match sum.checked_add(1) {
             Some(s) => s,
-            None => return Err("[ERROR] i32 overflow: Illegal Equation!".to_string()),
+            None => return Err(IllegalEquation),
         }
     }
     Ok(sum)
 }
 
-fn part_parser(equation: &str, table: &mut TableDesc, begin: i32) -> Result<i32, String> {
+fn part_parser(equation: &str, table: &mut TableDesc, begin: i32) -> Result<i32, ErrorCases> {
     let mut sum = begin;
     for formula in equation.split('+') {
         sum += 1;
@@ -89,14 +91,14 @@ fn part_parser(equation: &str, table: &mut TableDesc, begin: i32) -> Result<i32,
     Ok(sum - begin)
 }
 
-fn formula_spliter(target: &str) -> Result<Vec<FormulaDesc>, String> {
+fn formula_spliter(target: &str) -> Result<Vec<FormulaDesc>, ErrorCases> {
     let mut v: Vec<FormulaDesc> = Vec::new();
     lazy_static! {
         static ref RE: Regex = Regex::new(r"\((([A-Z][a-z]*(\d+)*)+)\)(\d+)*").unwrap();
     }
 
     if !RE.is_match(target) {
-        return Err("[ERROR] No more to split!".to_string());
+        return Err(SplitError);
     }
     for cap in RE.captures_iter(target) {
         let mut times: i32;
@@ -106,7 +108,7 @@ fn formula_spliter(target: &str) -> Result<Vec<FormulaDesc>, String> {
         } else {
             times = match cap4.trim().parse::<i32>() {
                 Ok(s) => s,
-                Err(_) => return Err("[ERROR] Not a number!".to_string()),
+                Err(_) => return Err(I32ParseError),
             }
         }
         v.push(FormulaDesc {
@@ -118,13 +120,13 @@ fn formula_spliter(target: &str) -> Result<Vec<FormulaDesc>, String> {
     Ok(v)
 }
 
-fn get_token(target: &str) -> Result<Vec<TokenDesc>, String> {
+fn get_token(target: &str) -> Result<Vec<TokenDesc>, ErrorCases> {
     let mut v: Vec<TokenDesc> = Vec::new();
     lazy_static! {
         static ref RE: Regex = Regex::new(r"([A-Z][a-z]*)(\d+)*").unwrap();
     }
     if !RE.is_match(target) {
-        return Err("[ERROR] No tokens!".to_string());
+        return Err(NoTokens);
     }
     for cap in RE.captures_iter(target) {
         let cap2 = cap.get(2).map_or("", |m| m.as_str());
@@ -134,7 +136,7 @@ fn get_token(target: &str) -> Result<Vec<TokenDesc>, String> {
         } else {
             times = match cap2.trim().parse::<i32>() {
                 Ok(s) => s,
-                Err(_) => return Err("[ERROR] Not a number!".to_string()),
+                Err(_) => return Err(I32ParseError),
             }
         }
         v.push(TokenDesc {
@@ -145,12 +147,12 @@ fn get_token(target: &str) -> Result<Vec<TokenDesc>, String> {
     Ok(v)
 }
 
-fn mul_phrase(phrase: &FormulaDesc) -> Result<String, String> {
+fn mul_phrase(phrase: &FormulaDesc) -> Result<String, ErrorCases> {
     let mut v = get_token(&phrase.formula_self)?;
     for token in &mut v {
         token.times = match token.times.checked_mul(phrase.times) {
             Some(s) => s,
-            None => return Err("[ERROR] i32 overflow".to_string()),
+            None => return Err(I32Overflow),
         }
     }
     let mut s: String = String::new();
@@ -170,10 +172,11 @@ fn parser_formula(
     formula: &str,
     table: &mut TableDesc,
     location: usize,
-) -> Result<bool, String> {
+) -> Result<bool, ErrorCases> {
     let formula_backup = formula;
     let mut formula = format!("({})", formula_backup);
 
+    formula_spliter(&formula)?;
     while formula_spliter(&formula).is_ok() {
         for p in formula_spliter(&formula)? {
             formula = replace_phrase(&formula, &p.all, &(mul_phrase(&p)?));

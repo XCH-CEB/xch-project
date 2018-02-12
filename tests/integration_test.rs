@@ -18,6 +18,7 @@ extern crate lib_xch;
 mod testers;
 
 use testers::{tester, tester_error};
+use lib_xch::handler::ErrorCases::*;
 
 #[test]
 fn simples() {
@@ -36,16 +37,43 @@ fn brackets() {
 
 #[test]
 fn illegal_equation() {
-    tester_error("A+()=B", 10, "[ERROR] No tokens!");
-    tester_error("(((A))))=B", 10, "[ERROR] Can't match!");
+    tester_error("AAAA", 10, &IllegalEquation);
+    tester_error("AAAA==", 10, &IllegalEquation);
+    tester_error("/A=A*", 10, &IllegalEquation);
+    // The third situation can't impl.
 }
 
 #[test]
 fn i32_overflow() {
-    tester_error("(((A32767)32767)32434)54342=A", 30, "[ERROR] i32 overflow");
+    tester_error("(((A32767)32767)32434)54342=A", 30, &I32Overflow);
+}
+
+#[test]
+fn match_error() {
+    tester_error("(((A))))=B", 10, &MatchError);
+}
+
+#[test]
+fn split_error() {
+    tester_error("+=A", 10, &SplitError);
+}
+
+#[test]
+fn no_tokens() {
+    // No example yet.
+}
+
+#[test]
+fn not_found() {
+    // No example yet.
 }
 
 #[test]
 fn no_answer() {
-    tester_error("A=V", 32, "No answer");
+    tester_error("A=B", 32, &NoAnswer);
+}
+
+#[test]
+fn i32_parse_error() {
+    tester_error("(A)111111111111111111111111111=A", 10, &I32ParseError);
 }

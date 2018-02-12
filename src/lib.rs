@@ -13,6 +13,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+// Documentation
+//! This is the official library of xch-ceb.
+//! It can parse and balance *the Chemical Equation*.
+//!
+//! -  Unlimited brackets
+//! -  No Periodic table of the elements needed
+//!
+//! # Getting Started
+//!
+//! Just use the `handler_api`: ``lib_xch::handler::handler_api("H2O=H2+O2", 10);``
+
 // extern crate(s)
 #[macro_use]
 extern crate lazy_static;

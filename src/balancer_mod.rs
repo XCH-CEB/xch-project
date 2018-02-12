@@ -19,6 +19,8 @@ use std::vec::Vec;
 use std::i32;
 // inside uses
 use structs::ChemicalEquation;
+use handler::ErrorCases;
+use handler::ErrorCases::I32Overflow;
 
 pub fn xch_try(
     f: i32,
@@ -27,7 +29,7 @@ pub fn xch_try(
     list: &[Vec<i32>],
     chmcl_f_sut: &ChemicalEquation,
     len: usize,
-) -> Result<bool, String> {
+) -> Result<bool, ErrorCases> {
     if f == chmcl_f_sut.sum + 1 {
         match check(traversal, list, chmcl_f_sut, len) {
             Ok(true) => return Ok(true),
@@ -53,7 +55,7 @@ fn check(
     list: &[Vec<i32>],
     chmcl_f_sut: &ChemicalEquation,
     len: usize,
-) -> Result<bool, String> {
+) -> Result<bool, ErrorCases> {
     let mut tmp1: i32;
     let mut tmp2: i32;
     for item in list.iter().take(len + 1).skip(1) {
@@ -63,22 +65,22 @@ fn check(
             let tmp: i32;
             tmp = match item[j].checked_mul(traversal[j - 1]) {
                 Some(s) => s,
-                None => return Err("[ERROR] i32 overflow".to_string()),
+                None => return Err(I32Overflow),
             };
             tmp1 = match tmp1.checked_add(tmp) {
                 Some(s) => s,
-                None => return Err("[ERROR] i32 overflow".to_string()),
+                None => return Err(I32Overflow),
             };
         }
         for j in chmcl_f_sut.left_num as usize + 1..chmcl_f_sut.sum as usize + 1 {
             let tmp: i32;
             tmp = match item[j].checked_mul(traversal[j - 1]) {
                 Some(s) => s,
-                None => return Err("[ERROR] i32 overflow".to_string()),
+                None => return Err(I32Overflow),
             };
             tmp2 = match tmp2.checked_add(tmp) {
                 Some(s) => s,
-                None => return Err("[ERROR] i32 overflow".to_string()),
+                None => return Err(I32Overflow),
             };
         }
         if tmp1 != tmp2 {

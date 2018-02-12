@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-use lib_xch::handler::handler_api;
+use lib_xch::handler::{handler_api, ErrorCases};
 
 pub fn tester(equ: &str, range: i32, v: &[i32]) {
     let tmp = match handler_api(equ, range) {
@@ -23,10 +23,10 @@ pub fn tester(equ: &str, range: i32, v: &[i32]) {
     assert_eq!(tmp, v);
 }
 
-pub fn tester_error(equ: &str, range: i32, err: &str) {
-    let tmp = match handler_api(equ, range) {
+pub fn tester_error(payload: &str, range: i32, err: &ErrorCases) {
+    let tmp = match handler_api(payload, range) {
         Ok(_) => panic!("Failed!"),
         Err(s) => s.error_message,
     };
-    assert_eq!(tmp, err.to_string());
+    assert_eq!(tmp, *err);
 }

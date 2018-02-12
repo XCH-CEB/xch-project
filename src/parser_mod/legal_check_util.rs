@@ -15,24 +15,28 @@
 
 // Overall: This is the source code of the Delta-3 Parser.
 
-pub fn legal_check(equation: &str) -> Result<bool, String> {
+// inside uses
+use handler::ErrorCases;
+use handler::ErrorCases::{IllegalEquation, MatchError};
+
+pub fn legal_check(equation: &str) -> Result<bool, ErrorCases> {
     let equation = equation.chars().into_iter().collect::<Vec<_>>();
     let mut tmp = 0;
     for i in equation {
         if check_char(i) == 0 {
-            return Err("[ERROR] Illegal Equation!".to_string());
+            return Err(IllegalEquation);
         }
         if i == '=' {
             tmp += 1;
         }
     }
     if tmp != 1 {
-        return Err("[ERROR] Illegal Equation!".to_string());
+        return Err(IllegalEquation);
     }
     Ok(true)
 }
 
-pub fn legal_check_brackets(formula: &str) -> Result<bool, String> {
+pub fn legal_check_brackets(formula: &str) -> Result<bool, ErrorCases> {
     let formula = formula.chars().into_iter().collect::<Vec<_>>();
     for i in 0..formula.len() {
         if formula[i] == '(' {
@@ -45,7 +49,7 @@ pub fn legal_check_brackets(formula: &str) -> Result<bool, String> {
     Ok(true)
 }
 
-fn brackets_matcher(formula: &[char], pos: usize, mode: bool) -> Result<usize, String> {
+fn brackets_matcher(formula: &[char], pos: usize, mode: bool) -> Result<usize, ErrorCases> {
     let mut fake_stack = 0;
 
     if mode {
@@ -75,7 +79,7 @@ fn brackets_matcher(formula: &[char], pos: usize, mode: bool) -> Result<usize, S
             }
         }
     }
-    Err("[ERROR] Can't match!".to_string())
+    Err(MatchError)
 }
 
 fn check_char(test: char) -> i32 {

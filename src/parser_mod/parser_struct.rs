@@ -17,7 +17,9 @@
 
 // inside uses
 use structs::ElementStruct;
-use parser_mod::get_token;
+use super::get_token;
+use handler::ErrorCases;
+use handler::ErrorCases::{I32Overflow, NotFound};
 
 pub struct FormulaDesc {
     pub formula_self: String,
@@ -38,7 +40,7 @@ pub struct TableDesc {
 }
 
 impl TableDesc {
-    pub fn store_in_table(&mut self, formula: &str, location: usize) -> Result<bool, String> {
+    pub fn store_in_table(&mut self, formula: &str, location: usize) -> Result<bool, ErrorCases> {
         for t in get_token(formula)? {
             if !self.find_element_in_table(&t.token_name).is_ok() {
                 let len = self.elements_table.len();
@@ -54,7 +56,7 @@ impl TableDesc {
                 let tmp = self.find_element_in_table(&t.token_name)?; // It have been checked.
                 self.list[tmp][location] = match self.list[tmp][location].checked_add(t.times) {
                     Some(s) => s,
-                    None => return Err("[ERROR] i32 overflow".to_string()),
+                    None => return Err(I32Overflow),
                 }
             }
         }
@@ -91,12 +93,12 @@ impl TableDesc {
         v
     }
 
-    fn find_element_in_table(&self, target: &str) -> Result<usize, String> {
+    fn find_element_in_table(&self, target: &str) -> Result<usize, ErrorCases> {
         for i in &(self.elements_table) {
             if i.name == *target {
                 return Ok(i.num);
             }
         }
-        Err("[ERROR] Not found!".to_string())
+        Err(NotFound)
     }
 }
