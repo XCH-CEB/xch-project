@@ -30,7 +30,7 @@ use self::legal_check_util::{legal_check, legal_check_brackets};
 use handler::ErrorCases;
 use handler::ErrorCases::{I32Overflow, I32ParseError, IllegalEquation, NoTokens, SplitError};
 
-pub fn xch_parser(equation: &str) -> Result<(ChemicalEquation, usize, Vec<Vec<i32>>), ErrorCases> {
+pub fn xch_parser(equation: &str) -> Result<(ChemicalEquation, Vec<Vec<i32>>), ErrorCases> {
     legal_check(equation)?;
     let mut chemical_equation_struct = ChemicalEquation {
         left_num: 0,
@@ -63,11 +63,7 @@ pub fn xch_parser(equation: &str) -> Result<(ChemicalEquation, usize, Vec<Vec<i3
     }
 
     // return
-    Ok((
-        chemical_equation_struct,
-        table.get_elements_table_len(),
-        table.get_list(),
-    ))
+    Ok((chemical_equation_struct, table.get_list()))
 }
 
 fn parser_get_sum(equation: &str) -> Result<i32, ErrorCases> {

@@ -63,10 +63,6 @@ impl TableDesc {
         Ok(true)
     }
 
-    pub fn get_elements_table_len(&self) -> usize {
-        self.elements_table.len()
-    }
-
     pub fn get_list(&self) -> Vec<Vec<i32>> {
         (self.list).to_vec()
     }

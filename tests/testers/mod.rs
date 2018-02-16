@@ -15,16 +15,16 @@
 
 use lib_xch::handler::{handler_api, ErrorCases};
 
-pub fn tester(equ: &str, range: i32, v: &[i32]) {
-    let tmp = match handler_api(equ, range) {
+pub fn tester(equ: &str, v: &[i32]) {
+    let tmp = match handler_api(equ) {
         Ok(v) => v,
         Err(e) => panic!(e),
     };
     assert_eq!(tmp, v);
 }
 
-pub fn tester_error(payload: &str, range: i32, err: &ErrorCases) {
-    let tmp = match handler_api(payload, range) {
+pub fn tester_error(payload: &str, err: &ErrorCases) {
+    let tmp = match handler_api(payload) {
         Ok(_) => panic!("Failed!"),
         Err(s) => s.error_message,
     };

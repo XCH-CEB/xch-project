@@ -22,40 +22,43 @@ use lib_xch::handler::ErrorCases::*;
 
 #[test]
 fn simples() {
-    tester("H2O=H2+O2", 10, &[2, 2, 1]);
+    tester("H2O=H2+O2", &[2, 2, 1]);
+    tester("Al+Fe3O4=Fe+Al2O3", &[8, 3, 9, 4]);
+    tester("FeS2+O2=Fe2O3+SO2", &[4, 11, 2, 8]);
+    tester("Al2(SO4)3+NaOH=Na2SO4+Al(OH)3", &[1, 6, 3, 2]);
 }
 
 #[test]
 fn high_performance() {
-    tester("As2O3+Zn+HCl=AsH3+ZnCl2+H2O", 50, &[1, 6, 12, 2, 6, 3]);
+    tester("As2O3+Zn+HCl=AsH3+ZnCl2+H2O", &[1, 6, 12, 2, 6, 3]);
 }
 
 #[test]
 fn brackets() {
-    tester("O2(O3(O)4O5(O))=O", 50, &[1, 15]);
+    tester("O2(O3(O)4O5(O))=O", &[1, 15]);
 }
 
 #[test]
 fn illegal_equation() {
-    tester_error("AAAA", 10, &IllegalEquation);
-    tester_error("AAAA==", 10, &IllegalEquation);
-    tester_error("/A=A*", 10, &IllegalEquation);
+    tester_error("AAAA", &IllegalEquation);
+    tester_error("AAAA==", &IllegalEquation);
+    tester_error("/A=A*", &IllegalEquation);
     // The third situation can't impl.
 }
 
 #[test]
 fn i32_overflow() {
-    tester_error("(((A32767)32767)32434)54342=A", 30, &I32Overflow);
+    tester_error("(((A32767)32767)32434)54342=A", &I32Overflow);
 }
 
 #[test]
 fn match_error() {
-    tester_error("(((A))))=B", 10, &MatchError);
+    tester_error("(((A))))=B", &MatchError);
 }
 
 #[test]
 fn split_error() {
-    tester_error("+=A", 10, &SplitError);
+    tester_error("+=A", &SplitError);
 }
 
 #[test]
@@ -69,11 +72,26 @@ fn not_found() {
 }
 
 #[test]
+fn i32_abs_error() {
+    // No example yet.
+}
+
+#[test]
+fn free_variables() {
+    // No example yet.
+}
+
+#[test]
+fn unsolvable() {
+    // No example yet.
+}
+
+#[test]
 fn no_answer() {
-    tester_error("A=B", 32, &NoAnswer);
+    tester_error("A=B", &NoAnswer);
 }
 
 #[test]
 fn i32_parse_error() {
-    tester_error("(A)111111111111111111111111111=A", 10, &I32ParseError);
+    tester_error("(A)111111111111111111111111111=A", &I32ParseError);
 }
