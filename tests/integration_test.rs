@@ -78,7 +78,10 @@ fn i32_abs_error() {
 
 #[test]
 fn free_variables() {
-    // No example yet.
+    tester_error(
+        "K4Fe(CN)6+H2SO4+H2O=K2SO4+FeSO4+(NH4)2SO4+CO",
+        &FreeVariables,
+    );
 }
 
 #[test]

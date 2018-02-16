@@ -55,7 +55,7 @@ impl GuassianElimination {
                 }
             }
         }
-
+        self.check()?;
         let mut ans: Vec<Frac> = Vec::new();
         ans.push(self.matrix_b[self.n].div(self.matrix_a[self.n][self.n])?);
         for i in (1..self.n).rev() {
@@ -65,7 +65,6 @@ impl GuassianElimination {
             }
             ans.push(self.matrix_b[i].sub(sum)?.div(self.matrix_a[i][i])?);
         }
-        self.check()?;
         Ok(ans) // x_{n} to x_{1}
     }
 
