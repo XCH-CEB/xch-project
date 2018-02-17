@@ -18,6 +18,7 @@ use parser_mod::xch_parser;
 use balancer_mod::xch_balancer;
 
 /// the API balances the Chemical Equation by equation.
+/// It provides one balanced solution, but it may isn't the *most* correct solution.
 /// If the equation can balance, function would return a `i32` vector which contains the answer.
 /// If not, it would return `handler::ErrorHandler` which contains Delta-3 the parser's result and error message.
 ///
@@ -25,11 +26,11 @@ use balancer_mod::xch_balancer;
 ///
 /// The equation you provided should be a common unbalanced chemical equation which only contains **one** `=`.
 ///
-/// -  Stack Overflow may cause **panic**. Because it is using recusive balancer and regex-based parser.
+/// -  Stack Overflow may cause **panic**. Because it is using regex-based parser.
 /// -  The implement for Ord trait may cause **panic**. Because it should return `Ordering`.
 ///
 /// And in the other failed situation, it'll return a `error_message` and contain `parser_result`(maybe it is empty).
-pub fn handler_api(equation: &str) -> Result<Vec<i32>, ErrorHandler> {
+pub fn handler_api(equation: &str) -> Result<ResultHandler, ErrorHandler> {
     // T is successful traversal vector, E is list vector which parser returned.
     let (chemical_equation_struct, list) = match xch_parser(equation) {
         Ok(some) => some,
@@ -59,6 +60,13 @@ pub struct ErrorHandler {
     pub parser_result: Vec<Vec<i32>>,
 }
 
+/// `ResultHandler` returns the balancer's result.
+/// And it may contain warning message.
+pub struct ResultHandler {
+    pub warn_message: WarnCases,
+    pub result: Vec<i32>,
+}
+
 /// All the Error Types.
 ///
 /// -  more or less than 1 `=`; not allowed chars; too many formulas.
@@ -85,4 +93,14 @@ pub enum ErrorCases {
     FreeVariables,
     Unsolvable,
     I32AbsError,
+}
+
+/// All the Warning Types.
+///
+/// -  Free variables detected, result may be wrong.
+/// -  No warning.
+#[derive(PartialEq, Debug)]
+pub enum WarnCases {
+    FreeVariablesDetected,
+    NoWarn,
 }

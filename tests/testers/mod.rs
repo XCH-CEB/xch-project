@@ -17,7 +17,7 @@ use lib_xch::handler::{handler_api, ErrorCases};
 
 pub fn tester(equ: &str, v: &[i32]) {
     let tmp = match handler_api(equ) {
-        Ok(v) => v,
+        Ok(v) => v.result,
         Err(e) => {
             println!("{:?}", e.error_message);
             panic!(e.error_message)

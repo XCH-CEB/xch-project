@@ -23,8 +23,9 @@ use std::vec::Vec;
 use std::i32;
 // inside uses
 use structs::ChemicalEquation;
-use handler::ErrorCases;
+use handler::{ErrorCases, ResultHandler};
 use handler::ErrorCases::{I32Overflow, NoAnswer};
+use handler::WarnCases::{FreeVariablesDetected, NoWarn};
 use self::guass_eliminate::GuassianElimination;
 use self::frac_util::Frac;
 use self::public_methods::nlcm;
@@ -32,7 +33,7 @@ use self::public_methods::nlcm;
 pub fn xch_balancer(
     list: &[Vec<i32>],
     chmcl_f_sut: &ChemicalEquation,
-) -> Result<Vec<i32>, ErrorCases> {
+) -> Result<ResultHandler, ErrorCases> {
     let free_variable_n = if list.len() - 1 > (chmcl_f_sut.sum) as usize {
         list.len() - 1 - (chmcl_f_sut.sum) as usize
     } else {
@@ -73,7 +74,14 @@ pub fn xch_balancer(
     }
     let int_set = &mut to_int_set(guass_ans)?[..];
     int_set.reverse();
-    Ok(int_set.to_vec())
+    Ok(ResultHandler {
+        warn_message: if free_variable_n == 0 {
+            NoWarn
+        } else {
+            FreeVariablesDetected
+        },
+        result: int_set.to_vec(),
+    })
 }
 
 fn to_int_set(mut v: Vec<Frac>) -> Result<Vec<i32>, ErrorCases> {
