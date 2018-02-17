@@ -88,7 +88,7 @@ fn to_int_set(mut v: Vec<Frac>) -> Result<Vec<i32>, ErrorCases> {
             Some(s) => s,
             None => return Err(I32Overflow),
         };
-        if i.numerator == 0 {
+        if i.numerator <= 0 {
             return Err(NoAnswer);
         }
         result.push(i.numerator);

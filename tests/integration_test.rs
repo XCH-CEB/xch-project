@@ -26,11 +26,15 @@ fn simples() {
     tester("Al+Fe3O4=Fe+Al2O3", &[8, 3, 9, 4]);
     tester("FeS2+O2=Fe2O3+SO2", &[4, 11, 2, 8]);
     tester("Al2(SO4)3+NaOH=Na2SO4+Al(OH)3", &[1, 6, 3, 2]);
+    tester("As2O3+Zn+HCl=AsH3+ZnCl2+H2O", &[1, 6, 12, 2, 6, 3]);
 }
 
 #[test]
 fn high_performance() {
-    tester("As2O3+Zn+HCl=AsH3+ZnCl2+H2O", &[1, 6, 12, 2, 6, 3]);
+    tester(
+        "H2+Ca(CN)2+NaAlF4+FeSO4+MgSiO3+KI+H3PO4+PbCrO4+BrCl+CF2Cl2+SO2=PbBr2+CrCl3+MgCO3+KAl(OH)4+Fe(SCN)3+PI3+Na2SiO3+CaF2+H2O",
+        &[88, 15, 6, 10, 3, 6, 2, 6, 12, 3, 20, 6, 6, 3, 6, 10, 2, 3, 15, 79],
+    );
 }
 
 #[test]
@@ -92,6 +96,7 @@ fn unsolvable() {
 #[test]
 fn no_answer() {
     tester_error("A=B", &NoAnswer);
+    tester_error("KClO3+HCl=KCl+ClO2+Cl2+H2O", &NoAnswer); // INP Model can't solve it.
 }
 
 #[test]
