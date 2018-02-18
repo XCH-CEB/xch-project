@@ -15,7 +15,7 @@
 
 // Overall: This is the source code of the AlphaForce Balancer.
 
-mod guass_eliminate;
+mod gauss_eliminate;
 mod public_methods;
 mod frac_util;
 
@@ -25,61 +25,41 @@ use std::i32;
 use structs::ChemicalEquation;
 use handler::{ErrorCases, ResultHandler};
 use handler::ErrorCases::{I32Overflow, NoAnswer};
-use handler::WarnCases::{FreeVariablesDetected, NoWarn};
-use self::guass_eliminate::GuassianElimination;
+use self::gauss_eliminate::GaussianElimination;
 use self::frac_util::Frac;
 use self::public_methods::nlcm;
 
 pub fn xch_balancer(
     list: &[Vec<i32>],
     chmcl_f_sut: &ChemicalEquation,
-) -> Result<ResultHandler, ErrorCases> {
-    let free_variable_n = if list.len() - 1 > (chmcl_f_sut.sum) as usize {
-        list.len() - 1 - (chmcl_f_sut.sum) as usize
-    } else {
-        chmcl_f_sut.sum as usize - (list.len() - 1)
-    };
+) -> Result<ResultHandler<Vec<i32>>, ErrorCases> {
     let mut equation_matrix: Vec<Vec<Frac>> = Vec::new();
-    let mut result_matrix = vec![Frac::new(0, 1); list.len()];
-    equation_matrix.push(vec![Frac::new(0, 1)]); // Just fill one is enough.
-    for i in 1..list.len() {
+    let result_matrix = vec![Frac::new(0, 1); list.len() - 1];
+    for item in list.iter().skip(1) {
         let mut v: Vec<Frac> = Vec::new();
-        v.push(Frac::new(0, 1));
-        for j in 1..(chmcl_f_sut.left_num + 1) as usize {
-            if j <= free_variable_n {
-                result_matrix[i] = result_matrix[i].sub(Frac::new(list[i][j], 1))?;
-            } else {
-                v.push(Frac::new(list[i][j], 1));
-            }
+        for item_j in item.iter()
+            .take((chmcl_f_sut.left_num + 1) as usize)
+            .skip(1)
+        {
+            v.push(Frac::new(*item_j, 1));
         }
-        for j in (chmcl_f_sut.left_num + 1) as usize..(chmcl_f_sut.sum + 1) as usize {
-            if j <= free_variable_n {
-                result_matrix[i] = result_matrix[i].add(Frac::new(list[i][j], 1))?;
-            } else {
-                v.push(Frac::new(-list[i][j], 1));
-            }
+        for item_j in item.iter()
+            .take((chmcl_f_sut.sum + 1) as usize)
+            .skip((chmcl_f_sut.left_num + 1) as usize)
+        {
+            v.push(Frac::new(-item_j, 1));
         }
         equation_matrix.push(v);
     }
-    let mut guass_ans = GuassianElimination::new(
+    let gauss_ans = GaussianElimination::new(
         equation_matrix,
         result_matrix,
-        chmcl_f_sut.sum as usize - free_variable_n,
+        list.len() - 1,
+        chmcl_f_sut.sum as usize,
     ).solve()?;
-    {
-        // to push free variables
-        for _ in 0..free_variable_n {
-            guass_ans.push(Frac::new(1, 1));
-        }
-    }
-    let int_set = &mut to_int_set(guass_ans)?[..];
-    int_set.reverse();
+    let int_set = &mut to_int_set(gauss_ans.result)?[..];
     Ok(ResultHandler {
-        warn_message: if free_variable_n == 0 {
-            NoWarn
-        } else {
-            FreeVariablesDetected
-        },
+        warn_message: gauss_ans.warn_message,
         result: int_set.to_vec(),
     })
 }

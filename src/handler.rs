@@ -18,7 +18,7 @@ use parser_mod::xch_parser;
 use balancer_mod::xch_balancer;
 
 /// the API balances the Chemical Equation by equation.
-/// It provides one balanced solution, but it may isn't the *most* correct solution.
+/// It provides one balanced solution, but it may isn't the *most* correct solution (because it set all free variables = 1).
 /// If the equation can balance, function would return a `i32` vector which contains the answer.
 /// If not, it would return `handler::ErrorHandler` which contains Delta-3 the parser's result and error message.
 ///
@@ -30,7 +30,7 @@ use balancer_mod::xch_balancer;
 /// -  The implement for Ord trait may cause **panic**. Because it should return `Ordering`.
 ///
 /// And in the other failed situation, it'll return a `error_message` and contain `parser_result`(maybe it is empty).
-pub fn handler_api(equation: &str) -> Result<ResultHandler, ErrorHandler> {
+pub fn handler_api(equation: &str) -> Result<ResultHandler<Vec<i32>>, ErrorHandler> {
     // T is successful traversal vector, E is list vector which parser returned.
     let (chemical_equation_struct, list) = match xch_parser(equation) {
         Ok(some) => some,
@@ -62,9 +62,9 @@ pub struct ErrorHandler {
 
 /// `ResultHandler` returns the balancer's result.
 /// And it may contain warning message.
-pub struct ResultHandler {
+pub struct ResultHandler<T> {
     pub warn_message: WarnCases,
-    pub result: Vec<i32>,
+    pub result: T,
 }
 
 /// All the Error Types.
@@ -77,7 +77,6 @@ pub struct ResultHandler {
 /// -  not found in `elements_table`.
 /// -  no answer.
 /// -  Can't parse into i32.
-/// -  Contians Free Variables.
 /// -  Equation set unsolvable.
 /// -  i32 `checked_abs()` error.
 #[derive(PartialEq, Debug)]
@@ -90,7 +89,6 @@ pub enum ErrorCases {
     NotFound,
     NoAnswer,
     I32ParseError,
-    FreeVariables,
     Unsolvable,
     I32AbsError,
 }

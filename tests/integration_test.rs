@@ -25,8 +25,13 @@ fn simples() {
     tester("H2O=H2+O2", &[2, 2, 1]);
     tester("Al+Fe3O4=Fe+Al2O3", &[8, 3, 9, 4]);
     tester("FeS2+O2=Fe2O3+SO2", &[4, 11, 2, 8]);
-    tester("Al2(SO4)3+NaOH=Na2SO4+Al(OH)3", &[1, 6, 3, 2]);
     tester("As2O3+Zn+HCl=AsH3+ZnCl2+H2O", &[1, 6, 12, 2, 6, 3]);
+    tester("ABCDE=ABCDE", &[1, 1]);
+    tester(
+        "K4Fe(CN)6+H2SO4+H2O=K2SO4+FeSO4+(NH4)2SO4+CO",
+        &[1, 6, 6, 2, 1, 3, 6],
+    );
+    tester("Al2(SO4)3+NaOH=Na2SO4+Al(OH)3", &[1, 6, 3, 2]);
 }
 
 #[test]
@@ -78,14 +83,6 @@ fn not_found() {
 #[test]
 fn i32_abs_error() {
     // No example yet.
-}
-
-#[test]
-fn free_variables() {
-    tester_error(
-        "K4Fe(CN)6+H2SO4+H2O=K2SO4+FeSO4+(NH4)2SO4+CO",
-        &FreeVariables,
-    );
 }
 
 #[test]
