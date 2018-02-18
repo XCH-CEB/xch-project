@@ -163,7 +163,11 @@ impl GaussianElimination {
                 fake_zero = false;
             }
         }
-        Some(leftmost)
+        if fake_zero {
+            None
+        } else {
+            Some(leftmost)
+        }
     }
 
     fn mul_row(&self, row: usize, multiplicator: Frac) -> Result<Vec<Frac>, ErrorCases> {
