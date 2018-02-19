@@ -90,7 +90,7 @@ fn part_parser(equation: &str, table: &mut TableDesc, begin: i32) -> Result<i32,
 fn formula_spliter(target: &str) -> Result<Vec<FormulaDesc>, ErrorCases> {
     let mut v: Vec<FormulaDesc> = Vec::new();
     lazy_static! {
-        static ref RE: Regex = Regex::new(r"\((([A-Z][a-z]*(\d+)*)+)\)(\d+)*").unwrap();
+        static ref RE: Regex = Regex::new(r"\((([A-Z][a-z]*(\d+)*)+)\)(\d+)*").unwrap(); // safe unwrap
     }
 
     if !RE.is_match(target) {
@@ -119,7 +119,7 @@ fn formula_spliter(target: &str) -> Result<Vec<FormulaDesc>, ErrorCases> {
 fn get_token(target: &str) -> Result<Vec<TokenDesc>, ErrorCases> {
     let mut v: Vec<TokenDesc> = Vec::new();
     lazy_static! {
-        static ref RE: Regex = Regex::new(r"([A-Z][a-z]*)(\d+)*").unwrap();
+        static ref RE: Regex = Regex::new(r"([A-Z][a-z]*)(\d+)*").unwrap(); // safe unwrap
     }
     if !RE.is_match(target) {
         return Err(NoTokens);

@@ -93,6 +93,9 @@ fn unsolvable() {
 #[test]
 fn no_answer() {
     tester_error("A=B", &NoAnswer);
+    tester_error("A+A=B", &NoAnswer); // issue #1
+    tester_error("A+A=A+B", &NoAnswer); // issue #1
+    tester_error("A+A=AA+B", &NoAnswer); // issue #1
     tester_error("KClO3+HCl=KCl+ClO2+Cl2+H2O", &NoAnswer); // INP Model can't solve it.
 }
 

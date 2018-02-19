@@ -15,6 +15,7 @@
 
 // Overall: This is the source code of the AlphaForce Balancer.
 
+use std::collections::HashMap;
 use handler::{ErrorCases, ResultHandler};
 use handler::ErrorCases::Unsolvable;
 use handler::WarnCases::{FreeVariablesDetected, NoWarn};
@@ -25,11 +26,6 @@ pub struct GaussianElimination {
     matrix_b: Vec<Frac>,      // A n*1 matrix.
     n: usize,
     m: usize,
-}
-
-struct Pivots {
-    col: Vec<usize>,
-    row: Vec<usize>,
 }
 
 impl GaussianElimination {
@@ -93,14 +89,14 @@ impl GaussianElimination {
         let pivots = self.check()?;
         let mut free_variable = false;
         for i in (0..self.m).rev() {
-            if pivots.col.contains(&i) {
+            if pivots.contains_key(&i) {
                 let mut sum = Frac::new(0, 1);
                 for (k, item) in ans.iter().enumerate().take(self.m).skip(i + 1) {
-                    sum = sum.add(self.matrix_a[pivots.row[i]][k].mul(*item)?)?;
+                    sum = sum.add(self.matrix_a[pivots[&i]][k].mul(*item)?)?;
                 }
-                ans[i] = self.matrix_b[pivots.row[i]]
+                ans[i] = self.matrix_b[pivots[&i]]
                     .sub(sum)?
-                    .div(self.matrix_a[pivots.row[i]][i])?;
+                    .div(self.matrix_a[pivots[&i]][i])?;
             } else {
                 free_variable = true;
                 ans[i] = Frac::new(1, 1); // set all free variables = 1/1.
@@ -116,13 +112,11 @@ impl GaussianElimination {
         }) // x_{n} to x_{1}
     }
 
-    fn check(&self) -> Result<Pivots, ErrorCases> {
-        let mut col: Vec<usize> = Vec::new();
-        let mut row: Vec<usize> = Vec::new();
+    fn check(&self) -> Result<HashMap<usize, usize>, ErrorCases> {
+        let mut pivots: HashMap<usize, usize> = HashMap::new();
         for i in 0..self.n {
             if self.get_pivot(i).is_some() {
-                col.push(self.get_pivot(i).unwrap());
-                row.push(i);
+                pivots.insert(self.get_pivot(i).unwrap(), i); // safe unwrap
             }
             if self.matrix_a[i] == vec![Frac::new(0, 1); self.n + 1]
                 && self.matrix_b[i] != Frac::new(0, 1)
@@ -130,7 +124,7 @@ impl GaussianElimination {
                 return Err(Unsolvable);
             }
         }
-        Ok(Pivots { col, row })
+        Ok(pivots)
     }
 
     fn get_pivot(&self, row: usize) -> Option<usize> {
