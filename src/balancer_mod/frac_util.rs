@@ -168,36 +168,33 @@ impl PartialOrd for Frac {
         if other.denominator == 0 {
             None
         } else {
-            Some(self.cmp(other))
+            let denominator = lcm(self.denominator, other.denominator).expect("[Ord] LCM Error");
+            let this_numerator = match denominator.checked_div(self.denominator) {
+                Some(s) => s,
+                None => panic!("[Ord] i32 Overflow"),
+            };
+            let other_numerator = match denominator.checked_div(other.denominator) {
+                Some(s) => s,
+                None => panic!("[Ord] i32 Overflow"),
+            };
+            let this_numerator = match this_numerator.checked_mul(self.numerator) {
+                Some(s) => s,
+                None => panic!("[Ord] i32 Overflow"),
+            };
+            let other_numerator = match other_numerator.checked_mul(other.numerator) {
+                Some(s) => s,
+                None => panic!("[Ord] i32 Overflow"),
+            };
+            Some(this_numerator.cmp(&other_numerator))
         }
-    }
-}
-
-impl Ord for Frac {
-    fn cmp(&self, other: &Frac) -> Ordering {
-        let denominator = lcm(self.denominator, other.denominator).expect("[Ord] LCM Error");
-        let this_numerator = match denominator.checked_div(self.denominator) {
-            Some(s) => s,
-            None => panic!("[Ord] i32 Overflow"),
-        };
-        let other_numerator = match denominator.checked_div(other.denominator) {
-            Some(s) => s,
-            None => panic!("[Ord] i32 Overflow"),
-        };
-        let this_numerator = match this_numerator.checked_mul(self.numerator) {
-            Some(s) => s,
-            None => panic!("[Ord] i32 Overflow"),
-        };
-        let other_numerator = match other_numerator.checked_mul(other.numerator) {
-            Some(s) => s,
-            None => panic!("[Ord] i32 Overflow"),
-        };
-        this_numerator.cmp(&other_numerator)
     }
 }
 
 impl PartialEq for Frac {
     fn eq(&self, other: &Frac) -> bool {
+        if !other.check().is_ok() {
+            panic!("[Eq] UndefinedFrac")
+        }
         let denominator = lcm(self.denominator, other.denominator).expect("[Eq] LCM Error");
         let this_numerator = match denominator.checked_div(self.denominator) {
             Some(s) => s,
@@ -218,5 +215,3 @@ impl PartialEq for Frac {
         this_numerator == other_numerator
     }
 }
-
-impl Eq for Frac {}

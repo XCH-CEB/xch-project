@@ -27,7 +27,7 @@ use balancer_mod::xch_balancer;
 /// The equation you provided should be a common unbalanced chemical equation which only contains **one** `=`.
 ///
 /// -  Stack Overflow may cause **panic**. Because it is using regex-based parser.
-/// -  The implement for Ord trait may cause **panic**. Because it should return `Ordering`.
+/// -  The implement for `PartialOrd` and `PartialEq` trait may cause **panic**. Because it should return `Ordering`.
 ///
 /// And in the other failed situation, it'll return a `error_message` and contain `parser_result`(maybe it is empty).
 pub fn handler_api(equation: &str) -> Result<ResultHandler<Vec<i32>>, ErrorHandler> {
