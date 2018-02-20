@@ -15,8 +15,8 @@
 
 // Overall: This is the source code of the Delta-3 Parser.
 
+use std::collections::HashMap;
 // inside uses
-use structs::ElementStruct;
 use super::get_token;
 use handler::ErrorCases;
 use handler::ErrorCases::{I32Overflow, NotFound};
@@ -34,7 +34,7 @@ pub struct TokenDesc {
 
 // Object-Oriented
 pub struct TableDesc {
-    elements_table: Vec<ElementStruct>, // store the index of elements
+    elements_table: HashMap<String, usize>, // store the index of elements
     list: Vec<Vec<i32>>,
     formula_sum: i32,
 }
@@ -42,18 +42,21 @@ pub struct TableDesc {
 impl TableDesc {
     pub fn store_in_table(&mut self, formula: &str, location: usize) -> Result<bool, ErrorCases> {
         for t in get_token(formula)? {
-            if !self.find_element_in_table(&t.token_name).is_ok() {
+            if !self.elements_table.contains_key(&t.token_name) {
                 let len = self.elements_table.len();
-                self.elements_table.push(ElementStruct {
-                    name: t.token_name.clone(),
-                    num: len + 1, // WARN: the elements_table[0].num will be 1
-                });
+                self.elements_table.insert(
+                    t.token_name.clone(),
+                    len + 1, // WARN: the elements_table[0].num will be 1
+                );
                 self.update_list_vec();
             }
 
             {
                 // store data in table
-                let tmp = self.find_element_in_table(&t.token_name)?; // It have been checked.
+                let tmp = match self.elements_table.get(&t.token_name) {
+                    Some(s) => *s,
+                    None => return Err(NotFound),
+                }; // It have been checked.
                 self.list[tmp][location] = match self.list[tmp][location].checked_add(t.times) {
                     Some(s) => s,
                     None => return Err(I32Overflow),
@@ -70,7 +73,7 @@ impl TableDesc {
     pub fn new(sum: i32) -> Self {
         // PLEASE call update_list_vec after new!
         Self {
-            elements_table: Vec::new(),
+            elements_table: HashMap::new(),
             list: Vec::new(),
             formula_sum: sum,
         }
@@ -87,14 +90,5 @@ impl TableDesc {
             v.push(0);
         }
         v
-    }
-
-    fn find_element_in_table(&self, target: &str) -> Result<usize, ErrorCases> {
-        for i in &(self.elements_table) {
-            if i.name == *target {
-                return Ok(i.num);
-            }
-        }
-        Err(NotFound)
     }
 }

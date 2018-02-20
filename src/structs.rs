@@ -13,13 +13,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-use std::string::String;
-
-pub struct ElementStruct {
-    pub name: String,
-    pub num: usize,
-}
-
 pub struct ChemicalEquation {
     pub left_num: i32,
     pub right_num: i32,
