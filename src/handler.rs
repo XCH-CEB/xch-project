@@ -79,6 +79,7 @@ pub struct ResultHandler<T> {
 /// -  Can't parse into i32.
 /// -  Equation set unsolvable.
 /// -  i32 `checked_abs()` error.
+/// -  The denominator of a fraction is 0.
 #[derive(PartialEq, Debug)]
 pub enum ErrorCases {
     IllegalEquation,
@@ -91,6 +92,7 @@ pub enum ErrorCases {
     I32ParseError,
     Unsolvable,
     I32AbsError,
+    UndefinedFrac,
 }
 
 /// All the Warning Types.

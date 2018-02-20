@@ -32,6 +32,8 @@ fn simples() {
         &[1, 6, 6, 2, 1, 3, 6],
     );
     tester("Al2(SO4)3+NaOH=Na2SO4+Al(OH)3", &[1, 6, 3, 2]);
+    tester("CuSO4+NaOH=Na2SO4+Cu(OH)2", &[1, 2, 1, 1]);
+    tester("Fe(OH)3+H2SO4=Fe2(SO4)3+H2O", &[2, 3, 1, 6]);
 }
 
 #[test]
