@@ -1,0 +1,13 @@
+language: rust
+rust:
+  - stable
+cache: cargo
+install:
+  - rustup toolchain install nightly-x86_64-unknown-linux-gnu
+  - rustup toolchain list
+  - cargo +nightly install clippy
+script:
+  - cargo update
+  - cargo build --verbose --all
+  - cargo +nightly clippy
+  - cargo test --verbose --all
