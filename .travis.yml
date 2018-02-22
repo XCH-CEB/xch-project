@@ -8,6 +8,6 @@ install:
   - cargo +nightly install clippy
 script:
   - cargo update
-  - cargo build --verbose --all
+  - cargo build --verbose
   - cargo +nightly clippy
-  - cargo test --verbose --all
+  - cargo test --verbose
