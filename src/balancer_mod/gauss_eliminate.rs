@@ -32,10 +32,10 @@ impl GaussianElimination {
     pub fn new(matrix_a: Vec<Vec<Frac>>, matrix_b: Vec<Frac>, n: usize, m: usize) -> Self {
         // Create a GaussianElimination Solution.
         Self {
-            matrix_a: matrix_a,
-            matrix_b: matrix_b,
-            n: n,
-            m: m,
+            matrix_a,
+            matrix_b,
+            n,
+            m,
         }
     }
 
@@ -64,9 +64,9 @@ impl GaussianElimination {
                 for u in i + 1..self.n {
                     let v = self.mul_row(i, self.matrix_a[u][j])?; // v has n+1 elements
                     for (k, item) in v.iter().enumerate().take(self.m) {
-                        self.matrix_a[u][k] = self.matrix_a[u][k].sub(*item)?; // A_{u}=A_{u}-A_{u}{j}*A_{i}
+                        self.matrix_a[u][k] = (self.matrix_a[u][k] - (*item))?; // A_{u}=A_{u}-A_{u}{j}*A_{i}
                     }
-                    self.matrix_b[u] = self.matrix_b[u].sub(v[self.m])?;
+                    self.matrix_b[u] = (self.matrix_b[u] - v[self.m])?;
                 }
             }
         } // REF
@@ -80,9 +80,9 @@ impl GaussianElimination {
                 // j above i
                 let v = self.mul_row(i, self.matrix_a[u][j])?; // v has n+1 elements
                 for (k, item) in v.iter().enumerate().take(self.m) {
-                    self.matrix_a[u][k] = self.matrix_a[u][k].sub(*item)?; // A_{u}=A_{u}-A_{u}{j}*A_{i}
+                    self.matrix_a[u][k] = (self.matrix_a[u][k] - (*item))?; // A_{u}=A_{u}-A_{u}{j}*A_{i}
                 }
-                self.matrix_b[u] = self.matrix_b[u].sub(v[self.m])?;
+                self.matrix_b[u] = (self.matrix_b[u] - v[self.m])?;
             }
         } // RREF
         let mut ans: Vec<Frac> = vec![Frac::new(0, 1); self.m];
@@ -92,11 +92,9 @@ impl GaussianElimination {
             if pivots.contains_key(&i) {
                 let mut sum = Frac::new(0, 1);
                 for (k, item) in ans.iter().enumerate().take(self.m).skip(i + 1) {
-                    sum = sum.add(self.matrix_a[pivots[&i]][k].mul(*item)?)?;
+                    sum = (sum + (self.matrix_a[pivots[&i]][k] * (*item))?)?;
                 }
-                ans[i] = self.matrix_b[pivots[&i]]
-                    .sub(sum)?
-                    .div(self.matrix_a[pivots[&i]][i])?;
+                ans[i] = ((self.matrix_b[pivots[&i]] - sum)? / self.matrix_a[pivots[&i]][i])?;
             } else {
                 free_variable = true;
                 ans[i] = Frac::new(1, 1); // set all free variables = 1/1.
@@ -167,17 +165,17 @@ impl GaussianElimination {
     fn mul_row(&self, row: usize, multiplicator: Frac) -> Result<Vec<Frac>, ErrorCases> {
         let mut v: Vec<Frac> = Vec::new();
         for column in 0..self.m {
-            v.push(self.matrix_a[row][column].mul(multiplicator)?);
+            v.push((self.matrix_a[row][column] * multiplicator)?);
         }
-        v.push(self.matrix_b[row].mul(multiplicator)?);
+        v.push((self.matrix_b[row] * multiplicator)?);
         Ok(v)
     }
 
     fn divide_row(&mut self, row: usize, divisor: Frac) -> Result<bool, ErrorCases> {
         for column in 0..self.m {
-            self.matrix_a[row][column] = self.matrix_a[row][column].div(divisor)?;
+            self.matrix_a[row][column] = (self.matrix_a[row][column] / divisor)?;
         }
-        self.matrix_b[row] = self.matrix_b[row].div(divisor)?;
+        self.matrix_b[row] = (self.matrix_b[row] / divisor)?;
         Ok(true)
     }
 

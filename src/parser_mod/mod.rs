@@ -28,7 +28,8 @@ use structs::ChemicalEquation;
 use self::parser_struct::{FormulaDesc, TableDesc, TokenDesc};
 use self::legal_check_util::{legal_check, legal_check_brackets};
 use handler::ErrorCases;
-use handler::ErrorCases::{I32Overflow, I32ParseError, IllegalEquation, NoTokens, SplitError};
+use handler::ErrorCases::{I32ParseError, NoTokens, SplitError};
+use public::{safe_calc, Operator};
 
 pub fn xch_parser(equation: &str) -> Result<(ChemicalEquation, Vec<Vec<i32>>), ErrorCases> {
     legal_check(equation)?;
@@ -69,10 +70,7 @@ pub fn xch_parser(equation: &str) -> Result<(ChemicalEquation, Vec<Vec<i32>>), E
 fn parser_get_sum(equation: &str) -> Result<i32, ErrorCases> {
     let mut sum: i32 = 0;
     for _ in equation.split('+') {
-        sum = match sum.checked_add(1) {
-            Some(s) => s,
-            None => return Err(IllegalEquation),
-        }
+        sum = safe_calc(sum, 1, &Operator::Add)?;
     }
     Ok(sum)
 }
@@ -109,7 +107,7 @@ fn formula_spliter(target: &str) -> Result<Vec<FormulaDesc>, ErrorCases> {
         }
         v.push(FormulaDesc {
             formula_self: cap[1].to_string(),
-            times: times,
+            times,
             all: cap[0].to_string(),
         });
     }
@@ -137,7 +135,7 @@ fn get_token(target: &str) -> Result<Vec<TokenDesc>, ErrorCases> {
         }
         v.push(TokenDesc {
             token_name: cap[1].to_string(),
-            times: times,
+            times,
         });
     }
     Ok(v)
@@ -146,10 +144,7 @@ fn get_token(target: &str) -> Result<Vec<TokenDesc>, ErrorCases> {
 fn mul_phrase(phrase: &FormulaDesc) -> Result<String, ErrorCases> {
     let mut v = get_token(&phrase.formula_self)?;
     for token in &mut v {
-        token.times = match token.times.checked_mul(phrase.times) {
-            Some(s) => s,
-            None => return Err(I32Overflow),
-        }
+        token.times = safe_calc(token.times, phrase.times, &Operator::Mul)?;
     }
     let mut s: String = String::new();
     for token in v {

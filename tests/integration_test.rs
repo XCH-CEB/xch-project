@@ -59,7 +59,7 @@ fn illegal_equation() {
 
 #[test]
 fn i32_overflow() {
-    tester_error("(((A32767)32767)32434)54342=A", &I32Overflow);
+    tester_error("(((A32767)32767)32434)54342=A", &Overflow);
 }
 
 #[test]

@@ -15,31 +15,22 @@
 
 // Overall: This is the source code of the AlphaForce Balancer.
 
-use handler::ErrorCases::I32Overflow;
 use handler::ErrorCases;
+use public::{safe_calc, Operator};
 
 pub fn gcd(mut a: i32, mut b: i32) -> Result<i32, ErrorCases> {
     let mut t: i32;
     while b != 0 {
         t = b;
-        b = match a.checked_rem(b) {
-            Some(s) => s,
-            None => return Err(I32Overflow),
-        };
+        b = safe_calc(a, b, &Operator::Rem)?;
         a = t;
     }
     Ok(a)
 }
 
 pub fn lcm(a: i32, b: i32) -> Result<i32, ErrorCases> {
-    let a_b = match a.checked_mul(b) {
-        Some(s) => s,
-        None => return Err(I32Overflow),
-    };
-    match a_b.checked_div(gcd(a, b)?) {
-        Some(s) => Ok(s),
-        None => Err(I32Overflow),
-    }
+    let a_b = safe_calc(a, b, &Operator::Mul)?;
+    safe_calc(a_b, gcd(a, b)?, &Operator::Div)
 }
 
 pub fn nlcm(v: Vec<i32>) -> Result<i32, ErrorCases> {

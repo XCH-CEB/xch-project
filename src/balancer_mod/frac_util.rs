@@ -15,31 +15,23 @@
 
 // Overall: This is the source code of the AlphaForce Balancer.
 
-use super::public_methods::{gcd, lcm};
 use std::cmp::Ordering;
-use handler::ErrorCases::{I32AbsError, I32Overflow, UndefinedFrac};
+use std::ops;
+// inside uses
+use super::math_methods::{gcd, lcm};
+use handler::ErrorCases::UndefinedFrac;
 use handler::ErrorCases;
+use public::Operator::{Abs, Add, Div, Mul, Sub};
+use public::safe_calc;
 
 fn rfcd(a: &Frac, b: &Frac) -> Result<(i32, i32, i32), ErrorCases> {
     // reduction of fractions to a common denominator
-    let denominator = lcm(a.denominator, b.denominator)?;
-    let mut a_numerator = match denominator.checked_div(a.denominator) {
-        Some(s) => s,
-        None => return Err(I32Overflow),
-    };
-    let mut b_numerator = match denominator.checked_div(b.denominator) {
-        Some(s) => s,
-        None => return Err(I32Overflow),
-    };
-    a_numerator = match a_numerator.checked_mul(a.numerator) {
-        Some(s) => s,
-        None => return Err(I32Overflow),
-    };
-    b_numerator = match b_numerator.checked_mul(b.numerator) {
-        Some(s) => s,
-        None => return Err(I32Overflow),
-    };
-    Ok((a_numerator, b_numerator, denominator))
+    let d = lcm(a.denominator, b.denominator)?;
+    let mut a_n = safe_calc(d, a.denominator, &Div)?;
+    let mut b_n = safe_calc(d, b.denominator, &Div)?;
+    a_n = safe_calc(a_n, a.numerator, &Mul)?;
+    b_n = safe_calc(b_n, b.numerator, &Mul)?;
+    Ok((a_n, b_n, d))
 }
 
 #[derive(Clone, Copy)]
@@ -51,8 +43,8 @@ pub struct Frac {
 impl Frac {
     pub fn new(numerator: i32, denominator: i32) -> Self {
         Self {
-            numerator: numerator,
-            denominator: denominator,
+            numerator,
+            denominator,
         }
     }
 
@@ -67,108 +59,79 @@ impl Frac {
     pub fn simple(&self) -> Result<Self, ErrorCases> {
         self.check()?;
         let gcd = gcd(self.numerator, self.denominator)?;
-        let numerator = match self.numerator.checked_div(gcd) {
-            Some(s) => s,
-            None => return Err(I32Overflow),
-        };
-        let denominator = match self.denominator.checked_div(gcd) {
-            Some(s) => s,
-            None => return Err(I32Overflow),
-        };
-        self.check()?;
         Ok(Self {
-            numerator: numerator,
-            denominator: denominator,
+            numerator: safe_calc(self.numerator, gcd, &Div)?,
+            denominator: safe_calc(self.denominator, gcd, &Div)?,
         })
     }
 
     pub fn abs(&self) -> Result<Self, ErrorCases> {
         self.check()?;
-        let numerator = match self.numerator.checked_abs() {
-            Some(s) => s,
-            None => return Err(I32AbsError),
-        };
-        let denominator = match self.denominator.checked_abs() {
-            Some(s) => s,
-            None => return Err(I32AbsError),
-        };
         let mut tmp = Self {
-            numerator: numerator,
-            denominator: denominator,
+            numerator: safe_calc(self.numerator, 0, &Abs)?,
+            denominator: safe_calc(self.denominator, 0, &Abs)?,
         };
         tmp = tmp.simple()?;
         tmp.check()?;
         Ok(tmp)
     }
+}
 
-    pub fn add(&self, other: Self) -> Result<Self, ErrorCases> {
+impl ops::Add for Frac {
+    type Output = Result<Self, ErrorCases>;
+    fn add(self, b: Self) -> Result<Self, ErrorCases> {
         self.check()?;
-        other.check()?;
-        let (this_numerator, other_numerator, denominator) = rfcd(self, &other)?;
-        let this_numerator = match this_numerator.checked_add(other_numerator) {
-            Some(s) => s,
-            None => return Err(I32Overflow),
-        };
+        b.check()?;
+        let (a_n, b_n, d) = rfcd(&self, &b)?;
         let mut tmp = Self {
-            numerator: this_numerator,
-            denominator: denominator,
+            numerator: safe_calc(a_n, b_n, &Add)?,
+            denominator: d,
         };
         tmp = tmp.simple()?;
         tmp.check()?;
         Ok(tmp)
     }
+}
 
-    pub fn sub(&self, other: Self) -> Result<Self, ErrorCases> {
+impl ops::Sub for Frac {
+    type Output = Result<Self, ErrorCases>;
+    fn sub(self, b: Self) -> Result<Self, ErrorCases> {
         self.check()?;
-        other.check()?;
-        let (this_numerator, other_numerator, denominator) = rfcd(self, &other)?;
-        let this_numerator = match this_numerator.checked_sub(other_numerator) {
-            Some(s) => s,
-            None => return Err(I32Overflow),
-        };
+        b.check()?;
+        let (a_n, b_n, d) = rfcd(&self, &b)?;
         let mut tmp = Self {
-            numerator: this_numerator,
-            denominator: denominator,
+            numerator: safe_calc(a_n, b_n, &Sub)?,
+            denominator: d,
         };
         tmp = tmp.simple()?;
         tmp.check()?;
         Ok(tmp)
     }
+}
 
-    pub fn mul(&self, other: Self) -> Result<Self, ErrorCases> {
+impl ops::Mul for Frac {
+    type Output = Result<Self, ErrorCases>;
+    fn mul(self, b: Self) -> Result<Self, ErrorCases> {
         self.check()?;
-        other.check()?;
-        let numerator = match self.numerator.checked_mul(other.numerator) {
-            Some(s) => s,
-            None => return Err(I32Overflow),
-        };
-        let denominator = match self.denominator.checked_mul(other.denominator) {
-            Some(s) => s,
-            None => return Err(I32Overflow),
-        };
+        b.check()?;
         let mut tmp = Self {
-            numerator: numerator,
-            denominator: denominator,
+            numerator: safe_calc(self.numerator, b.numerator, &Mul)?,
+            denominator: safe_calc(self.denominator, b.denominator, &Mul)?,
         };
         tmp = tmp.simple()?;
         tmp.check()?;
         Ok(tmp)
     }
+}
 
-    pub fn div(&self, other: Self) -> Result<Self, ErrorCases> {
+impl ops::Div for Frac {
+    type Output = Result<Self, ErrorCases>;
+    fn div(self, b: Self) -> Result<Self, ErrorCases> {
         self.check()?;
-        other.check()?;
-        let numerator = match self.numerator.checked_mul(other.denominator) {
-            Some(s) => s,
-            None => return Err(I32Overflow),
-        };
-        let denominator = match self.denominator.checked_mul(other.numerator) {
-            Some(s) => s,
-            None => return Err(I32Overflow),
-        };
+        b.check()?;
         let mut tmp = Self {
-            numerator: numerator,
-            denominator: denominator,
+            numerator: safe_calc(self.numerator, b.denominator, &Mul)?,
+            denominator: safe_calc(self.denominator, b.numerator, &Mul)?,
         };
         tmp = tmp.simple()?;
         tmp.check()?;
@@ -177,39 +140,49 @@ impl Frac {
 }
 
 impl PartialOrd for Frac {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        if self.check().is_err() || other.check().is_err() {
+    fn partial_cmp(&self, b: &Self) -> Option<Ordering> {
+        if self.check().is_err() || b.check().is_err() {
             None
         } else {
-            let denominator = lcm(self.denominator, other.denominator).expect("[Ord] LCM Error");
-            let mut this_numerator = match denominator.checked_div(self.denominator) {
-                Some(s) => s,
-                None => panic!("[Ord] i32 Overflow"),
+            let d = match lcm(self.denominator, b.denominator) {
+                Ok(s) => s,
+                Err(e) => panic!("[Ord] `lcm` Err: {:?}", e),
             };
-            let mut other_numerator = match denominator.checked_div(other.denominator) {
-                Some(s) => s,
-                None => panic!("[Ord] i32 Overflow"),
+            let mut a_n = match safe_calc(d, self.denominator, &Div) {
+                Ok(s) => s,
+                Err(e) => panic!("[Ord] Err: {:?}", e),
             };
-            this_numerator = match this_numerator.checked_mul(self.numerator) {
-                Some(s) => s,
-                None => panic!("[Ord] i32 Overflow"),
+            let mut b_n = match safe_calc(d, b.denominator, &Div) {
+                Ok(s) => s,
+                Err(e) => panic!("[Ord] Err: {:?}", e),
             };
-            other_numerator = match other_numerator.checked_mul(other.numerator) {
-                Some(s) => s,
-                None => panic!("[Ord] i32 Overflow"),
+            a_n = match safe_calc(a_n, self.numerator, &Mul) {
+                Ok(s) => s,
+                Err(e) => panic!("[Ord] Err: {:?}", e),
             };
-            Some(this_numerator.cmp(&other_numerator))
+            b_n = match safe_calc(b_n, b.numerator, &Mul) {
+                Ok(s) => s,
+                Err(e) => panic!("[Ord] Err: {:?}", e),
+            };
+            Some(a_n.cmp(&b_n))
         }
     }
 }
 
 impl PartialEq for Frac {
-    fn eq(&self, other: &Self) -> bool {
-        if other.check().is_err() || self.check().is_err() {
+    fn eq(&self, b: &Self) -> bool {
+        if b.check().is_err() || self.check().is_err() {
             panic!("[Eq] UndefinedFrac")
         }
-        let this = self.simple().expect("[Eq] i32 Overflow");
-        let that = other.simple().expect("[Eq] i32 Overflow");
-        this.numerator == that.numerator
+        let a = match self.simple() {
+            Ok(s) => s,
+            Err(e) => panic!("[Eq] Err: {:?}", e),
+        };
+        // shadow `b`
+        let b = match b.simple() {
+            Ok(s) => s,
+            Err(e) => panic!("[Eq] Err: {:?}", e),
+        };
+        (a.numerator == b.numerator) && (a.denominator == b.denominator)
     }
 }

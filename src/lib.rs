@@ -34,3 +34,5 @@ pub mod handler;
 mod parser_mod;
 mod balancer_mod;
 mod structs;
+#[macro_use]
+mod public;

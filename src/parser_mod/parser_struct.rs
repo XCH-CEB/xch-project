@@ -19,7 +19,8 @@ use std::collections::HashMap;
 // inside uses
 use super::get_token;
 use handler::ErrorCases;
-use handler::ErrorCases::{I32Overflow, NotFound};
+use handler::ErrorCases::NotFound;
+use public::{safe_calc, Operator};
 
 pub struct FormulaDesc {
     pub formula_self: String,
@@ -57,10 +58,8 @@ impl TableDesc {
                     Some(s) => *s,
                     None => return Err(NotFound),
                 }; // It have been checked.
-                self.list[tmp][location] = match self.list[tmp][location].checked_add(t.times) {
-                    Some(s) => s,
-                    None => return Err(I32Overflow),
-                }
+                self.list[tmp][location] =
+                    safe_calc(self.list[tmp][location], t.times, &Operator::Add)?;
             }
         }
         Ok(true)

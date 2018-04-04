@@ -69,8 +69,8 @@ pub struct ResultHandler<T> {
 
 /// All the Error Types.
 ///
-/// -  more or less than 1 `=`; not allowed chars; too many formulas.
-/// -  i32 overflow.
+/// -  more or less than 1 `=`; not allowed chars.
+/// -  overflow.
 /// -  brackets are not matched.
 /// -  no formulas to split.
 /// -  no tokens to get.
@@ -78,12 +78,12 @@ pub struct ResultHandler<T> {
 /// -  no answer.
 /// -  Can't parse into i32.
 /// -  Equation set unsolvable.
-/// -  i32 `checked_abs()` error.
+/// -  `checked_abs()` error.
 /// -  The denominator of a fraction is 0.
 #[derive(PartialEq, Debug)]
 pub enum ErrorCases {
     IllegalEquation,
-    I32Overflow,
+    Overflow,
     MatchError,
     SplitError,
     NoTokens,
@@ -91,7 +91,7 @@ pub enum ErrorCases {
     NoAnswer,
     I32ParseError,
     Unsolvable,
-    I32AbsError,
+    AbsError,
     UndefinedFrac,
 }
 

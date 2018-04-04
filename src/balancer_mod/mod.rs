@@ -16,7 +16,7 @@
 // Overall: This is the source code of the AlphaForce Balancer.
 
 mod gauss_eliminate;
-mod public_methods;
+mod math_methods;
 mod frac_util;
 
 use std::vec::Vec;
@@ -24,10 +24,11 @@ use std::i32;
 // inside uses
 use structs::ChemicalEquation;
 use handler::{ErrorCases, ResultHandler};
-use handler::ErrorCases::{I32Overflow, NoAnswer};
+use handler::ErrorCases::NoAnswer;
 use self::gauss_eliminate::GaussianElimination;
 use self::frac_util::Frac;
-use self::public_methods::nlcm;
+use self::math_methods::nlcm;
+use public::{safe_calc, Operator};
 
 pub fn xch_balancer(
     list: &[Vec<i32>],
@@ -72,10 +73,7 @@ fn to_int_set(mut v: Vec<Frac>) -> Result<Vec<i32>, ErrorCases> {
     let lcm = nlcm(tmp)?;
     let mut result: Vec<i32> = Vec::new();
     for i in &mut v {
-        i.numerator *= match lcm.checked_div(i.denominator) {
-            Some(s) => s,
-            None => return Err(I32Overflow),
-        };
+        i.numerator *= safe_calc(lcm, i.denominator, &Operator::Div)?;
         if i.numerator <= 0 {
             return Err(NoAnswer);
         }
