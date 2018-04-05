@@ -15,26 +15,27 @@
 
 // Overall: This is the source code of the AlphaForce Balancer.
 
+// inside uses
 use handler::ErrorCases;
-use public::{safe_calc, Operator};
+use public::{safe_calc, CheckedType, Operator};
 
-pub fn gcd(mut a: i32, mut b: i32) -> Result<i32, ErrorCases> {
-    let mut t: i32;
-    while b != 0 {
+pub fn gcd<T: CheckedType + PartialEq>(mut a: T, mut b: T) -> Result<T, ErrorCases> {
+    let mut t: T;
+    while b != T::zero() {
         t = b;
-        b = safe_calc(a, b, &Operator::Rem)?;
+        b = safe_calc(&a, &b, &Operator::Rem)?;
         a = t;
     }
     Ok(a)
 }
 
-pub fn lcm(a: i32, b: i32) -> Result<i32, ErrorCases> {
-    let a_b = safe_calc(a, b, &Operator::Mul)?;
-    safe_calc(a_b, gcd(a, b)?, &Operator::Div)
+pub fn lcm<T: CheckedType>(a: T, b: T) -> Result<T, ErrorCases> {
+    let a_b = safe_calc(&a, &b, &Operator::Mul)?;
+    safe_calc(&a_b, &gcd(a, b)?, &Operator::Div)
 }
 
-pub fn nlcm(v: Vec<i32>) -> Result<i32, ErrorCases> {
-    let mut ans: i32 = 1;
+pub fn nlcm<T: CheckedType>(v: Vec<T>) -> Result<T, ErrorCases> {
+    let mut ans: T = T::one();
     for i in v {
         ans = lcm(ans, i)?;
     }

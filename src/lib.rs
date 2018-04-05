@@ -22,17 +22,17 @@
 //!
 //! # Getting Started
 //!
-//! Just use the `handler_api`: ``lib_xch::handler::handler_api("H2O=H2+O2", 10);``
+//! Just use the `handler_api`: ``lib_xch::handler::handler_api::<i32>("H2O=H2+O2");``
 
 // extern crate(s)
 #[macro_use]
 extern crate lazy_static;
+extern crate num_traits;
 extern crate regex;
 
 // mods
+pub mod public;
 pub mod handler;
 mod parser_mod;
 mod balancer_mod;
 mod structs;
-#[macro_use]
-mod public;

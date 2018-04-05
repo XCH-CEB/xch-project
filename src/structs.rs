@@ -14,7 +14,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 pub struct ChemicalEquation {
-    pub left_num: i32,
-    pub right_num: i32,
-    pub sum: i32, // sum of the left_num and the right_num
+    pub left_num: usize,
+    pub right_num: usize,
+    pub sum: usize, // sum of the left_num and the right_num
 }

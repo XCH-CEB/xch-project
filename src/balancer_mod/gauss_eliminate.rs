@@ -16,20 +16,22 @@
 // Overall: This is the source code of the AlphaForce Balancer.
 
 use std::collections::HashMap;
+// inside uses
 use handler::{ErrorCases, ResultHandler};
 use handler::ErrorCases::Unsolvable;
 use handler::WarnCases::{FreeVariablesDetected, NoWarn};
 use super::frac_util::Frac;
+use public::CheckedType;
 
-pub struct GaussianElimination {
-    matrix_a: Vec<Vec<Frac>>, // A n*n matrix.
-    matrix_b: Vec<Frac>,      // A n*1 matrix.
+pub struct GaussianElimination<T: CheckedType> {
+    matrix_a: Vec<Vec<Frac<T>>>, // A n*n matrix.
+    matrix_b: Vec<Frac<T>>,      // A n*1 matrix.
     n: usize,
     m: usize,
 }
 
-impl GaussianElimination {
-    pub fn new(matrix_a: Vec<Vec<Frac>>, matrix_b: Vec<Frac>, n: usize, m: usize) -> Self {
+impl<T: CheckedType> GaussianElimination<T> {
+    pub fn new(matrix_a: Vec<Vec<Frac<T>>>, matrix_b: Vec<Frac<T>>, n: usize, m: usize) -> Self {
         // Create a GaussianElimination Solution.
         Self {
             matrix_a,
@@ -39,7 +41,7 @@ impl GaussianElimination {
         }
     }
 
-    pub fn solve(&mut self) -> Result<ResultHandler<Vec<Frac>>, ErrorCases> {
+    pub fn solve(&mut self) -> Result<ResultHandler<Vec<Frac<T>>>, ErrorCases> {
         // The Gaussian-Jordan Algorithm
         for i in 0..self.n {
             let leftmosti = match self.get_leftmost_row(i) {
@@ -54,7 +56,7 @@ impl GaussianElimination {
                 None => continue,
             };
             let maxi = self.get_max_abs_row(i, j)?;
-            if self.matrix_a[maxi][j].numerator != 0 {
+            if self.matrix_a[maxi][j].numerator != T::zero() {
                 self.matrix_a.swap(i, maxi);
                 self.matrix_b.swap(i, maxi); // swap row i and maxi in matrix_a and matrix_b
                 {
@@ -85,19 +87,19 @@ impl GaussianElimination {
                 self.matrix_b[u] = (self.matrix_b[u] - v[self.m])?;
             }
         } // RREF
-        let mut ans: Vec<Frac> = vec![Frac::new(0, 1); self.m];
+        let mut ans: Vec<Frac<T>> = vec![Frac::new(T::zero(), T::one()); self.m];
         let pivots = self.check()?;
         let mut free_variable = false;
         for i in (0..self.m).rev() {
             if pivots.contains_key(&i) {
-                let mut sum = Frac::new(0, 1);
+                let mut sum = Frac::new(T::zero(), T::one());
                 for (k, item) in ans.iter().enumerate().take(self.m).skip(i + 1) {
                     sum = (sum + (self.matrix_a[pivots[&i]][k] * (*item))?)?;
                 }
                 ans[i] = ((self.matrix_b[pivots[&i]] - sum)? / self.matrix_a[pivots[&i]][i])?;
             } else {
                 free_variable = true;
-                ans[i] = Frac::new(1, 1); // set all free variables = 1/1.
+                ans[i] = Frac::new(T::one(), T::one()); // set all free variables = 1/1.
             }
         }
         Ok(ResultHandler {
@@ -116,8 +118,8 @@ impl GaussianElimination {
             if self.get_pivot(i).is_some() {
                 pivots.insert(self.get_pivot(i).unwrap(), i); // safe unwrap
             }
-            if self.matrix_a[i] == vec![Frac::new(0, 1); self.n + 1]
-                && self.matrix_b[i] != Frac::new(0, 1)
+            if self.matrix_a[i] == vec![Frac::new(T::zero(), T::one()); self.n + 1]
+                && self.matrix_b[i] != Frac::new(T::zero(), T::one())
             {
                 return Err(Unsolvable);
             }
@@ -127,7 +129,7 @@ impl GaussianElimination {
 
     fn get_pivot(&self, row: usize) -> Option<usize> {
         for column in 0..self.m {
-            if self.matrix_a[row][column] != Frac::new(0, 1) {
+            if self.matrix_a[row][column] != Frac::new(T::zero(), T::one()) {
                 return Some(column);
             }
         }
@@ -162,8 +164,8 @@ impl GaussianElimination {
         }
     }
 
-    fn mul_row(&self, row: usize, multiplicator: Frac) -> Result<Vec<Frac>, ErrorCases> {
-        let mut v: Vec<Frac> = Vec::new();
+    fn mul_row(&self, row: usize, multiplicator: Frac<T>) -> Result<Vec<Frac<T>>, ErrorCases> {
+        let mut v: Vec<Frac<T>> = Vec::new();
         for column in 0..self.m {
             v.push((self.matrix_a[row][column] * multiplicator)?);
         }
@@ -171,7 +173,7 @@ impl GaussianElimination {
         Ok(v)
     }
 
-    fn divide_row(&mut self, row: usize, divisor: Frac) -> Result<bool, ErrorCases> {
+    fn divide_row(&mut self, row: usize, divisor: Frac<T>) -> Result<bool, ErrorCases> {
         for column in 0..self.m {
             self.matrix_a[row][column] = (self.matrix_a[row][column] / divisor)?;
         }

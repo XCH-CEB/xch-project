@@ -22,26 +22,26 @@ use super::math_methods::{gcd, lcm};
 use handler::ErrorCases::UndefinedFrac;
 use handler::ErrorCases;
 use public::Operator::{Abs, Add, Div, Mul, Sub};
-use public::safe_calc;
+use public::{safe_calc, CheckedType};
 
-fn rfcd(a: &Frac, b: &Frac) -> Result<(i32, i32, i32), ErrorCases> {
+fn rfcd<T: CheckedType>(a: &Frac<T>, b: &Frac<T>) -> Result<(T, T, T), ErrorCases> {
     // reduction of fractions to a common denominator
     let d = lcm(a.denominator, b.denominator)?;
-    let mut a_n = safe_calc(d, a.denominator, &Div)?;
-    let mut b_n = safe_calc(d, b.denominator, &Div)?;
-    a_n = safe_calc(a_n, a.numerator, &Mul)?;
-    b_n = safe_calc(b_n, b.numerator, &Mul)?;
+    let mut a_n = safe_calc(&d, &a.denominator, &Div)?;
+    let mut b_n = safe_calc(&d, &b.denominator, &Div)?;
+    a_n = safe_calc(&a_n, &a.numerator, &Mul)?;
+    b_n = safe_calc(&b_n, &b.numerator, &Mul)?;
     Ok((a_n, b_n, d))
 }
 
 #[derive(Clone, Copy)]
-pub struct Frac {
-    pub numerator: i32,
-    pub denominator: i32,
+pub struct Frac<T: CheckedType> {
+    pub numerator: T,
+    pub denominator: T,
 }
 
-impl Frac {
-    pub fn new(numerator: i32, denominator: i32) -> Self {
+impl<T: CheckedType> Frac<T> {
+    pub fn new(numerator: T, denominator: T) -> Self {
         Self {
             numerator,
             denominator,
@@ -49,7 +49,7 @@ impl Frac {
     }
 
     pub fn check(&self) -> Result<bool, ErrorCases> {
-        if self.denominator == 0 {
+        if self.denominator == T::zero() {
             Err(UndefinedFrac)
         } else {
             Ok(true)
@@ -60,16 +60,16 @@ impl Frac {
         self.check()?;
         let gcd = gcd(self.numerator, self.denominator)?;
         Ok(Self {
-            numerator: safe_calc(self.numerator, gcd, &Div)?,
-            denominator: safe_calc(self.denominator, gcd, &Div)?,
+            numerator: safe_calc(&self.numerator, &gcd, &Div)?,
+            denominator: safe_calc(&self.denominator, &gcd, &Div)?,
         })
     }
 
     pub fn abs(&self) -> Result<Self, ErrorCases> {
         self.check()?;
         let mut tmp = Self {
-            numerator: safe_calc(self.numerator, 0, &Abs)?,
-            denominator: safe_calc(self.denominator, 0, &Abs)?,
+            numerator: safe_calc(&self.numerator, &T::zero(), &Abs)?,
+            denominator: safe_calc(&self.denominator, &T::zero(), &Abs)?,
         };
         tmp = tmp.simple()?;
         tmp.check()?;
@@ -77,14 +77,14 @@ impl Frac {
     }
 }
 
-impl ops::Add for Frac {
+impl<T: CheckedType> ops::Add for Frac<T> {
     type Output = Result<Self, ErrorCases>;
     fn add(self, b: Self) -> Result<Self, ErrorCases> {
         self.check()?;
         b.check()?;
         let (a_n, b_n, d) = rfcd(&self, &b)?;
         let mut tmp = Self {
-            numerator: safe_calc(a_n, b_n, &Add)?,
+            numerator: safe_calc(&a_n, &b_n, &Add)?,
             denominator: d,
         };
         tmp = tmp.simple()?;
@@ -93,14 +93,14 @@ impl ops::Add for Frac {
     }
 }
 
-impl ops::Sub for Frac {
+impl<T: CheckedType> ops::Sub for Frac<T> {
     type Output = Result<Self, ErrorCases>;
     fn sub(self, b: Self) -> Result<Self, ErrorCases> {
         self.check()?;
         b.check()?;
         let (a_n, b_n, d) = rfcd(&self, &b)?;
         let mut tmp = Self {
-            numerator: safe_calc(a_n, b_n, &Sub)?,
+            numerator: safe_calc(&a_n, &b_n, &Sub)?,
             denominator: d,
         };
         tmp = tmp.simple()?;
@@ -109,14 +109,14 @@ impl ops::Sub for Frac {
     }
 }
 
-impl ops::Mul for Frac {
+impl<T: CheckedType> ops::Mul for Frac<T> {
     type Output = Result<Self, ErrorCases>;
     fn mul(self, b: Self) -> Result<Self, ErrorCases> {
         self.check()?;
         b.check()?;
         let mut tmp = Self {
-            numerator: safe_calc(self.numerator, b.numerator, &Mul)?,
-            denominator: safe_calc(self.denominator, b.denominator, &Mul)?,
+            numerator: safe_calc(&self.numerator, &b.numerator, &Mul)?,
+            denominator: safe_calc(&self.denominator, &b.denominator, &Mul)?,
         };
         tmp = tmp.simple()?;
         tmp.check()?;
@@ -124,14 +124,14 @@ impl ops::Mul for Frac {
     }
 }
 
-impl ops::Div for Frac {
+impl<T: CheckedType> ops::Div for Frac<T> {
     type Output = Result<Self, ErrorCases>;
     fn div(self, b: Self) -> Result<Self, ErrorCases> {
         self.check()?;
         b.check()?;
         let mut tmp = Self {
-            numerator: safe_calc(self.numerator, b.denominator, &Mul)?,
-            denominator: safe_calc(self.denominator, b.numerator, &Mul)?,
+            numerator: safe_calc(&self.numerator, &b.denominator, &Mul)?,
+            denominator: safe_calc(&self.denominator, &b.numerator, &Mul)?,
         };
         tmp = tmp.simple()?;
         tmp.check()?;
@@ -139,7 +139,7 @@ impl ops::Div for Frac {
     }
 }
 
-impl PartialOrd for Frac {
+impl<T: CheckedType> PartialOrd for Frac<T> {
     fn partial_cmp(&self, b: &Self) -> Option<Ordering> {
         if self.check().is_err() || b.check().is_err() {
             None
@@ -148,19 +148,19 @@ impl PartialOrd for Frac {
                 Ok(s) => s,
                 Err(e) => panic!("[Ord] `lcm` Err: {:?}", e),
             };
-            let mut a_n = match safe_calc(d, self.denominator, &Div) {
+            let mut a_n = match safe_calc(&d, &self.denominator, &Div) {
                 Ok(s) => s,
                 Err(e) => panic!("[Ord] Err: {:?}", e),
             };
-            let mut b_n = match safe_calc(d, b.denominator, &Div) {
+            let mut b_n = match safe_calc(&d, &b.denominator, &Div) {
                 Ok(s) => s,
                 Err(e) => panic!("[Ord] Err: {:?}", e),
             };
-            a_n = match safe_calc(a_n, self.numerator, &Mul) {
+            a_n = match safe_calc(&a_n, &self.numerator, &Mul) {
                 Ok(s) => s,
                 Err(e) => panic!("[Ord] Err: {:?}", e),
             };
-            b_n = match safe_calc(b_n, b.numerator, &Mul) {
+            b_n = match safe_calc(&b_n, &b.numerator, &Mul) {
                 Ok(s) => s,
                 Err(e) => panic!("[Ord] Err: {:?}", e),
             };
@@ -169,7 +169,7 @@ impl PartialOrd for Frac {
     }
 }
 
-impl PartialEq for Frac {
+impl<T: CheckedType> PartialEq for Frac<T> {
     fn eq(&self, b: &Self) -> bool {
         if b.check().is_err() || self.check().is_err() {
             panic!("[Eq] UndefinedFrac")

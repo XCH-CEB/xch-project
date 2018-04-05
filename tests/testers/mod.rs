@@ -14,9 +14,10 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 use lib_xch::handler::{handler_api, ErrorCases};
+use lib_xch::public::CheckedType;
 
-pub fn tester(equ: &str, v: &[i32]) {
-    let tmp = match handler_api(equ) {
+pub fn tester<T: CheckedType>(equ: &str, v: &[T]) {
+    let tmp = match handler_api::<T>(equ) {
         Ok(v) => v.result,
         Err(e) => {
             println!("{:?}", e.error_message);
@@ -26,8 +27,8 @@ pub fn tester(equ: &str, v: &[i32]) {
     assert_eq!(tmp, v);
 }
 
-pub fn tester_error(payload: &str, err: &ErrorCases) {
-    let tmp = match handler_api(payload) {
+pub fn tester_error<T: CheckedType>(payload: &str, err: &ErrorCases) {
+    let tmp = match handler_api::<T>(payload) {
         Ok(_) => panic!("Failed!"),
         Err(s) => s.error_message,
     };

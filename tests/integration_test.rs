@@ -22,23 +22,23 @@ use lib_xch::handler::ErrorCases::*;
 
 #[test]
 fn simples() {
-    tester("H2O=H2+O2", &[2, 2, 1]);
-    tester("Al+Fe3O4=Fe+Al2O3", &[8, 3, 9, 4]);
-    tester("FeS2+O2=Fe2O3+SO2", &[4, 11, 2, 8]);
-    tester("As2O3+Zn+HCl=AsH3+ZnCl2+H2O", &[1, 6, 12, 2, 6, 3]);
-    tester("ABCDE=ABCDE", &[1, 1]);
-    tester(
+    tester::<i32>("H2O=H2+O2", &[2, 2, 1]);
+    tester::<i32>("Al+Fe3O4=Fe+Al2O3", &[8, 3, 9, 4]);
+    tester::<i32>("FeS2+O2=Fe2O3+SO2", &[4, 11, 2, 8]);
+    tester::<i32>("As2O3+Zn+HCl=AsH3+ZnCl2+H2O", &[1, 6, 12, 2, 6, 3]);
+    tester::<i32>("ABCDE=ABCDE", &[1, 1]);
+    tester::<i32>(
         "K4Fe(CN)6+H2SO4+H2O=K2SO4+FeSO4+(NH4)2SO4+CO",
         &[1, 6, 6, 2, 1, 3, 6],
     );
-    tester("Al2(SO4)3+NaOH=Na2SO4+Al(OH)3", &[1, 6, 3, 2]);
-    tester("CuSO4+NaOH=Na2SO4+Cu(OH)2", &[1, 2, 1, 1]);
-    tester("Fe(OH)3+H2SO4=Fe2(SO4)3+H2O", &[2, 3, 1, 6]);
+    tester::<i32>("Al2(SO4)3+NaOH=Na2SO4+Al(OH)3", &[1, 6, 3, 2]);
+    tester::<i32>("CuSO4+NaOH=Na2SO4+Cu(OH)2", &[1, 2, 1, 1]);
+    tester::<i32>("Fe(OH)3+H2SO4=Fe2(SO4)3+H2O", &[2, 3, 1, 6]);
 }
 
 #[test]
 fn high_performance() {
-    tester(
+    tester::<i32>(
         "H2+Ca(CN)2+NaAlF4+FeSO4+MgSiO3+KI+H3PO4+PbCrO4+BrCl+CF2Cl2+SO2=PbBr2+CrCl3+MgCO3+KAl(OH)4+Fe(SCN)3+PI3+Na2SiO3+CaF2+H2O",
         &[88, 15, 6, 10, 3, 6, 2, 6, 12, 3, 20, 6, 6, 3, 6, 10, 2, 3, 15, 79],
     );
@@ -46,30 +46,30 @@ fn high_performance() {
 
 #[test]
 fn brackets() {
-    tester("O2(O3(O)4O5(O))=O", &[1, 15]);
+    tester::<i32>("O2(O3(O)4O5(O))=O", &[1, 15]);
 }
 
 #[test]
 fn illegal_equation() {
-    tester_error("AAAA", &IllegalEquation);
-    tester_error("AAAA==", &IllegalEquation);
-    tester_error("/A=A*", &IllegalEquation);
+    tester_error::<i32>("AAAA", &IllegalEquation);
+    tester_error::<i32>("AAAA==", &IllegalEquation);
+    tester_error::<i32>("/A=A*", &IllegalEquation);
     // The third situation can't impl.
 }
 
 #[test]
-fn i32_overflow() {
-    tester_error("(((A32767)32767)32434)54342=A", &Overflow);
+fn overflow() {
+    tester_error::<i32>("(((A32767)32767)32434)54342=A", &Overflow);
 }
 
 #[test]
 fn match_error() {
-    tester_error("(((A))))=B", &MatchError);
+    tester_error::<i32>("(((A))))=B", &MatchError);
 }
 
 #[test]
 fn split_error() {
-    tester_error("+=A", &SplitError);
+    tester_error::<i32>("+=A", &SplitError);
 }
 
 #[test]
@@ -83,7 +83,7 @@ fn not_found() {
 }
 
 #[test]
-fn i32_abs_error() {
+fn abs_error() {
     // No example yet.
 }
 
@@ -94,14 +94,14 @@ fn unsolvable() {
 
 #[test]
 fn no_answer() {
-    tester_error("A=B", &NoAnswer);
-    tester_error("A+A=B", &NoAnswer); // issue #1
-    tester_error("A+A=A+B", &NoAnswer); // issue #1
-    tester_error("A+A=AA+B", &NoAnswer); // issue #1
-    tester_error("KClO3+HCl=KCl+ClO2+Cl2+H2O", &NoAnswer); // INP Model can't solve it.
+    tester_error::<i32>("A=B", &NoAnswer);
+    tester_error::<i32>("A+A=B", &NoAnswer); // issue #1
+    tester_error::<i32>("A+A=A+B", &NoAnswer); // issue #1
+    tester_error::<i32>("A+A=AA+B", &NoAnswer); // issue #1
+    tester_error::<i32>("KClO3+HCl=KCl+ClO2+Cl2+H2O", &NoAnswer); // INP Model can't solve it.
 }
 
 #[test]
-fn i32_parse_error() {
-    tester_error("(A)111111111111111111111111111=A", &I32ParseError);
+fn parse_error() {
+    tester_error::<i32>("(A)111111111111111111111111111=A", &ParseError);
 }

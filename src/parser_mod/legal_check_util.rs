@@ -18,6 +18,7 @@
 // inside uses
 use handler::ErrorCases;
 use handler::ErrorCases::{IllegalEquation, MatchError};
+use public::{safe_calc, Operator};
 
 pub fn legal_check(equation: &str) -> Result<bool, ErrorCases> {
     let equation = equation.chars().into_iter().collect::<Vec<_>>();
@@ -27,7 +28,7 @@ pub fn legal_check(equation: &str) -> Result<bool, ErrorCases> {
             return Err(IllegalEquation);
         }
         if i == '=' {
-            tmp += 1;
+            tmp = safe_calc(&tmp, &1, &Operator::Add)?;
         }
     }
     if tmp != 1 {
@@ -55,26 +56,26 @@ fn brackets_matcher(formula: &[char], pos: usize, mode: bool) -> Result<usize, E
     if mode {
         for (i, item) in formula.iter().enumerate().skip(pos + 1) {
             if *item == '(' {
-                fake_stack += 1;
+                fake_stack = safe_calc(&fake_stack, &1, &Operator::Add)?;
             }
             if *item == ')' {
                 if fake_stack == 0 {
                     return Ok(i);
                 } else {
-                    fake_stack -= 1;
+                    fake_stack = safe_calc(&fake_stack, &1, &Operator::Sub)?;
                 }
             }
         }
     } else {
         for i in (0..pos).rev() {
             if formula[i] == ')' {
-                fake_stack += 1;
+                fake_stack = safe_calc(&fake_stack, &1, &Operator::Add)?;
             }
             if formula[i] == '(' {
                 if fake_stack == 0 {
                     return Ok(i);
                 } else {
-                    fake_stack -= 1;
+                    fake_stack = safe_calc(&fake_stack, &1, &Operator::Sub)?;
                 }
             }
         }

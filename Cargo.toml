@@ -1,11 +1,12 @@
 [package]
 name = "lib_xch"
-version = "0.4.0"
+version = "0.5.1"
 authors = ["LEXUGE <LEXUGEyky@outlook.com>"]
 description = "Crate xch-ceb's official lib"
 license = "GPL-3.0"
 repository = "https://github.com/LEXUGE/lib-xch-ceb"
 
 [dependencies]
-lazy_static = "^1.x"
+lazy_static = "^1.0"
 regex = "^0.2"
+num-traits = "^0.2"

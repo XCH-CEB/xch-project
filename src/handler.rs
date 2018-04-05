@@ -16,10 +16,11 @@
 // inside uses
 use parser_mod::xch_parser;
 use balancer_mod::xch_balancer;
+use public::CheckedType;
 
 /// the API balances the Chemical Equation by equation.
 /// It provides one balanced solution, but it may isn't the *most* correct solution (because it set all free variables = 1).
-/// If the equation can balance, function would return a `i32` vector which contains the answer.
+/// If the equation can balance, function would return a `T` vector which contains the answer.
 /// If not, it would return `handler::ErrorHandler` which contains Delta-3 the parser's result and error message.
 ///
 /// # Panics
@@ -30,15 +31,17 @@ use balancer_mod::xch_balancer;
 /// -  The implement for `PartialOrd` and `PartialEq` trait may cause **panic**. Because it should return `Ordering`.
 ///
 /// And in the other failed situation, it'll return a `error_message` and contain `parser_result`(maybe it is empty).
-pub fn handler_api(equation: &str) -> Result<ResultHandler<Vec<i32>>, ErrorHandler> {
+pub fn handler_api<T: CheckedType>(
+    equation: &str,
+) -> Result<ResultHandler<Vec<T>>, ErrorHandler<T>> {
     // T is successful traversal vector, E is list vector which parser returned.
     let (chemical_equation_struct, list) = match xch_parser(equation) {
-        Ok(some) => some,
+        Ok(s) => s,
         Err(e) => {
             return Err(ErrorHandler {
                 error_message: e,
                 parser_result: {
-                    let list: Vec<Vec<i32>> = Vec::new();
+                    let list: Vec<Vec<T>> = Vec::new();
                     list
                 },
             })
@@ -55,30 +58,31 @@ pub fn handler_api(equation: &str) -> Result<ResultHandler<Vec<i32>>, ErrorHandl
 
 /// `ErrorHandler` returns when `handler::handler_api` failed somehow.
 /// **CAUTION: `parser_result` might empty if parser is failed.**
-pub struct ErrorHandler {
+pub struct ErrorHandler<T: CheckedType> {
     pub error_message: ErrorCases,
-    pub parser_result: Vec<Vec<i32>>,
+    pub parser_result: Vec<Vec<T>>,
 }
 
 /// `ResultHandler` returns the balancer's result.
 /// And it may contain warning message.
-pub struct ResultHandler<T> {
+pub struct ResultHandler<U> {
     pub warn_message: WarnCases,
-    pub result: T,
+    pub result: U,
 }
 
 /// All the Error Types.
 ///
-/// -  more or less than 1 `=`; not allowed chars.
+/// -  more or less than 1 `=` or not allowed chars.
 /// -  overflow.
 /// -  brackets are not matched.
 /// -  no formulas to split.
 /// -  no tokens to get.
 /// -  not found in `elements_table`.
 /// -  no answer.
-/// -  Can't parse into i32.
+/// -  Can't parse into `T`.
 /// -  Equation set unsolvable.
 /// -  `checked_abs()` error.
+/// -  `checked_neg()` error.
 /// -  The denominator of a fraction is 0.
 #[derive(PartialEq, Debug)]
 pub enum ErrorCases {
@@ -89,9 +93,10 @@ pub enum ErrorCases {
     NoTokens,
     NotFound,
     NoAnswer,
-    I32ParseError,
+    ParseError,
     Unsolvable,
     AbsError,
+    NegError,
     UndefinedFrac,
 }
 

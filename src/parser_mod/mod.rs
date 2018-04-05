@@ -22,16 +22,17 @@ mod parser_struct;
 use regex::Regex;
 use std::string::String;
 use std::vec::Vec;
-use std::i32;
 // inside uses
 use structs::ChemicalEquation;
 use self::parser_struct::{FormulaDesc, TableDesc, TokenDesc};
 use self::legal_check_util::{legal_check, legal_check_brackets};
 use handler::ErrorCases;
-use handler::ErrorCases::{I32ParseError, NoTokens, SplitError};
-use public::{safe_calc, Operator};
+use handler::ErrorCases::{NoTokens, ParseError, SplitError};
+use public::{safe_calc, CheckedType, Operator};
 
-pub fn xch_parser(equation: &str) -> Result<(ChemicalEquation, Vec<Vec<i32>>), ErrorCases> {
+pub fn xch_parser<T: CheckedType>(
+    equation: &str,
+) -> Result<(ChemicalEquation, Vec<Vec<T>>), ErrorCases> {
     legal_check(equation)?;
     let mut chemical_equation_struct = ChemicalEquation {
         left_num: 0,
@@ -43,8 +44,9 @@ pub fn xch_parser(equation: &str) -> Result<(ChemicalEquation, Vec<Vec<i32>>), E
         let v: Vec<&str> = equation.split('=').collect();
         let equation_left: String = String::from(v[0]);
         let equation_right: String = String::from(v[1]);
-        chemical_equation_struct.sum =
-            parser_get_sum(&equation_left)? + parser_get_sum(&equation_right)?;
+        let tmp1 = parser_get_sum(&equation_left)?;
+        let tmp2 = parser_get_sum(&equation_right)?;
+        chemical_equation_struct.sum = safe_calc(&tmp1, &tmp2, &Operator::Add)?;
     }
     let mut table = TableDesc::new(chemical_equation_struct.sum);
     table.update_list_vec(); // first access will be like list[1][1]
@@ -67,26 +69,30 @@ pub fn xch_parser(equation: &str) -> Result<(ChemicalEquation, Vec<Vec<i32>>), E
     Ok((chemical_equation_struct, table.get_list()))
 }
 
-fn parser_get_sum(equation: &str) -> Result<i32, ErrorCases> {
-    let mut sum: i32 = 0;
+fn parser_get_sum(equation: &str) -> Result<usize, ErrorCases> {
+    let mut sum: usize = 0;
     for _ in equation.split('+') {
-        sum = safe_calc(sum, 1, &Operator::Add)?;
+        sum = safe_calc(&sum, &1, &Operator::Add)?;
     }
     Ok(sum)
 }
 
-fn part_parser(equation: &str, table: &mut TableDesc, begin: i32) -> Result<i32, ErrorCases> {
+fn part_parser<T: CheckedType>(
+    equation: &str,
+    table: &mut TableDesc<T>,
+    begin: usize,
+) -> Result<usize, ErrorCases> {
     let mut sum = begin;
     for formula in equation.split('+') {
-        sum += 1;
+        sum = safe_calc(&sum, &1, &Operator::Add)?;
         legal_check_brackets(&formula.to_string())?;
-        parser_formula(&formula.to_string(), table, sum as usize)?;
+        parser_formula(&formula.to_string(), table, sum)?;
     }
     Ok(sum - begin)
 }
 
-fn formula_spliter(target: &str) -> Result<Vec<FormulaDesc>, ErrorCases> {
-    let mut v: Vec<FormulaDesc> = Vec::new();
+fn formula_spliter<T: CheckedType>(target: &str) -> Result<Vec<FormulaDesc<T>>, ErrorCases> {
+    let mut v: Vec<FormulaDesc<T>> = Vec::new();
     lazy_static! {
         static ref RE: Regex = Regex::new(r"\((([A-Z][a-z]*(\d+)*)+)\)(\d+)*").unwrap(); // safe unwrap
     }
@@ -95,14 +101,14 @@ fn formula_spliter(target: &str) -> Result<Vec<FormulaDesc>, ErrorCases> {
         return Err(SplitError);
     }
     for cap in RE.captures_iter(target) {
-        let mut times: i32;
+        let mut times: T;
         let cap4 = cap.get(4).map_or("", |m| m.as_str());
         if cap4 == "" {
-            times = 1;
+            times = T::one();
         } else {
-            times = match cap4.trim().parse::<i32>() {
+            times = match cap4.trim().parse::<T>() {
                 Ok(s) => s,
-                Err(_) => return Err(I32ParseError),
+                Err(_) => return Err(ParseError),
             }
         }
         v.push(FormulaDesc {
@@ -114,8 +120,8 @@ fn formula_spliter(target: &str) -> Result<Vec<FormulaDesc>, ErrorCases> {
     Ok(v)
 }
 
-fn get_token(target: &str) -> Result<Vec<TokenDesc>, ErrorCases> {
-    let mut v: Vec<TokenDesc> = Vec::new();
+fn get_token<T: CheckedType>(target: &str) -> Result<Vec<TokenDesc<T>>, ErrorCases> {
+    let mut v: Vec<TokenDesc<T>> = Vec::new();
     lazy_static! {
         static ref RE: Regex = Regex::new(r"([A-Z][a-z]*)(\d+)*").unwrap(); // safe unwrap
     }
@@ -124,13 +130,13 @@ fn get_token(target: &str) -> Result<Vec<TokenDesc>, ErrorCases> {
     }
     for cap in RE.captures_iter(target) {
         let cap2 = cap.get(2).map_or("", |m| m.as_str());
-        let mut times: i32;
+        let mut times: T;
         if cap2 == "" {
-            times = 1;
+            times = T::one();
         } else {
-            times = match cap2.trim().parse::<i32>() {
+            times = match cap2.trim().parse::<T>() {
                 Ok(s) => s,
-                Err(_) => return Err(I32ParseError),
+                Err(_) => return Err(ParseError),
             }
         }
         v.push(TokenDesc {
@@ -141,10 +147,10 @@ fn get_token(target: &str) -> Result<Vec<TokenDesc>, ErrorCases> {
     Ok(v)
 }
 
-fn mul_phrase(phrase: &FormulaDesc) -> Result<String, ErrorCases> {
+fn mul_phrase<T: CheckedType>(phrase: &FormulaDesc<T>) -> Result<String, ErrorCases> {
     let mut v = get_token(&phrase.formula_self)?;
     for token in &mut v {
-        token.times = safe_calc(token.times, phrase.times, &Operator::Mul)?;
+        token.times = safe_calc(&token.times, &phrase.times, &Operator::Mul)?;
     }
     let mut s: String = String::new();
     for token in v {
@@ -158,18 +164,18 @@ fn replace_phrase(target: &str, src: &str, des: &str) -> String {
     str::replace(target, src, des)
 }
 
-fn parser_formula(
+fn parser_formula<T: CheckedType>(
     // parse the chemical formula
     formula: &str,
-    table: &mut TableDesc,
+    table: &mut TableDesc<T>,
     location: usize,
 ) -> Result<bool, ErrorCases> {
     let formula_backup = formula;
     let mut formula = format!("({})", formula_backup);
 
-    formula_spliter(&formula)?;
-    while formula_spliter(&formula).is_ok() {
-        for p in formula_spliter(&formula)? {
+    formula_spliter::<T>(&formula)?;
+    while formula_spliter::<T>(&formula).is_ok() {
+        for p in formula_spliter::<T>(&formula)? {
             formula = replace_phrase(&formula, &p.all, &(mul_phrase(&p)?));
         }
     }

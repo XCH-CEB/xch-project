@@ -20,34 +20,34 @@ use std::collections::HashMap;
 use super::get_token;
 use handler::ErrorCases;
 use handler::ErrorCases::NotFound;
-use public::{safe_calc, Operator};
+use public::{safe_calc, CheckedType, Operator};
 
-pub struct FormulaDesc {
+pub struct FormulaDesc<T: CheckedType> {
     pub formula_self: String,
-    pub times: i32,
+    pub times: T,
     pub all: String,
 }
 
-pub struct TokenDesc {
+pub struct TokenDesc<T: CheckedType> {
     pub token_name: String,
-    pub times: i32,
+    pub times: T,
 }
 
 // Object-Oriented
-pub struct TableDesc {
+pub struct TableDesc<T: CheckedType> {
     elements_table: HashMap<String, usize>, // store the index of elements
-    list: Vec<Vec<i32>>,
-    formula_sum: i32,
+    list: Vec<Vec<T>>,
+    formula_sum: usize,
 }
 
-impl TableDesc {
+impl<T: CheckedType> TableDesc<T> {
     pub fn store_in_table(&mut self, formula: &str, location: usize) -> Result<bool, ErrorCases> {
         for t in get_token(formula)? {
             if !self.elements_table.contains_key(&t.token_name) {
                 let len = self.elements_table.len();
                 self.elements_table.insert(
                     t.token_name.clone(),
-                    len + 1, // WARN: the elements_table[0].num will be 1
+                    safe_calc(&len, &1, &Operator::Add)?, // WARN: the elements_table[0].num will be 1
                 );
                 self.update_list_vec();
             }
@@ -59,17 +59,17 @@ impl TableDesc {
                     None => return Err(NotFound),
                 }; // It have been checked.
                 self.list[tmp][location] =
-                    safe_calc(self.list[tmp][location], t.times, &Operator::Add)?;
+                    safe_calc(&self.list[tmp][location], &t.times, &Operator::Add)?;
             }
         }
         Ok(true)
     }
 
-    pub fn get_list(&self) -> Vec<Vec<i32>> {
+    pub fn get_list(&self) -> Vec<Vec<T>> {
         (self.list).to_vec()
     }
 
-    pub fn new(sum: i32) -> Self {
+    pub fn new(sum: usize) -> Self {
         // PLEASE call update_list_vec after new!
         Self {
             elements_table: HashMap::new(),
@@ -83,10 +83,10 @@ impl TableDesc {
         self.list.push(v);
     }
 
-    fn generate_vec(&self) -> Vec<i32> {
-        let mut v: Vec<i32> = Vec::new();
+    fn generate_vec(&self) -> Vec<T> {
+        let mut v: Vec<T> = Vec::new();
         for _ in 0..self.formula_sum + 1 {
-            v.push(0);
+            v.push(T::zero());
         }
         v
     }
