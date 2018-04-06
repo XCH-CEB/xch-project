@@ -13,10 +13,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+use std::ops::Rem;
 use std::str::FromStr;
 use std::marker::Copy;
 use std::fmt::Debug;
 use num_traits::Num;
+use num_traits::ops::checked::{CheckedAdd, CheckedDiv, CheckedMul, CheckedSub};
 // inside uses
 use handler::ErrorCases::{AbsError, NegError, Overflow};
 use handler::ErrorCases;
@@ -51,87 +53,78 @@ pub trait CheckedType
     // Empty
 }
 
-pub trait CheckedAdd: Sized {
-    fn checked_add(&self, rhs: &Self) -> Result<Self, ErrorCases>;
-}
-
-pub trait CheckedSub: Sized {
-    fn checked_sub(&self, rhs: &Self) -> Result<Self, ErrorCases>;
-}
-
-pub trait CheckedMul: Sized {
-    fn checked_mul(&self, rhs: &Self) -> Result<Self, ErrorCases>;
-}
-
-pub trait CheckedDiv: Sized {
-    fn checked_div(&self, rhs: &Self) -> Result<Self, ErrorCases>;
-}
-
-pub trait CheckedRem: Sized {
-    fn checked_rem(&self, rhs: &Self) -> Result<Self, ErrorCases>;
+pub trait CheckedRem: Sized + Rem<Self, Output = Self> {
+    fn checked_rem(&self, v: &Self) -> Option<Self>;
 }
 
 pub trait CheckedAbs: Sized {
-    fn checked_abs(&self) -> Result<Self, ErrorCases>;
+    fn checked_abs(&self) -> Option<Self>;
 }
 
 pub trait CheckedNeg: Sized {
-    fn checked_neg(&self) -> Result<Self, ErrorCases>;
+    fn checked_neg(&self) -> Option<Self>;
 }
-
 // marcos for auto-creating implementations
 macro_rules! checked_impl_double {
-    ($trait_name:ident, $method:ident, $t:ty, $error_type: ident) => {
+    ($trait_name:ident, $method:ident, $t:ty) => {
         impl $trait_name for $t {
-            fn $method(&self, rhs: &$t) -> Result<Self, ErrorCases> {
-                <$t>::$method(*self, *rhs).ok_or($error_type)
+            fn $method(&self, v: &$t) -> Option<$t> {
+                <$t>::$method(*self, *v)
             }
         }
     }
 }
 
 macro_rules! checked_impl_single {
-    ($trait_name:ident, $method:ident, $t:ty, $error_type: ident) => {
+    ($trait_name:ident, $method:ident, $t:ty) => {
         impl $trait_name for $t {
-            fn $method(&self) -> Result<Self, ErrorCases> {
-                <$t>::$method(*self).ok_or($error_type)
+            fn $method(&self) -> Option<$t> {
+                <$t>::$method(*self)
             }
         }
     }
 }
 
+macro_rules! checked_impl {
+    (int,$t:ty) => {
+        impl CheckedType for $t {}
+        checked_impl_double!(CheckedRem, checked_rem, $t);
+        checked_impl_single!(CheckedAbs, checked_abs, $t);
+        checked_impl_single!(CheckedNeg, checked_neg, $t);
+    };
+    (unsigned,$t:ty) => {
+        impl CheckedType for $t {}
+        checked_impl_double!(CheckedRem, checked_rem, $t);
+        checked_impl_single!(CheckedNeg, checked_neg, $t);
+        impl CheckedAbs for $t {
+            fn checked_abs(&self) -> Option<Self> {
+                Some(*self)
+            }
+        }
+    };
+}
+
 pub fn safe_calc<T: CheckedType>(a: &T, b: &T, op: &Operator) -> Result<T, ErrorCases> {
     match *op {
-        Operator::Add => CheckedAdd::checked_add(a, b),
-        Operator::Sub => CheckedSub::checked_sub(a, b),
-        Operator::Mul => CheckedMul::checked_mul(a, b),
-        Operator::Div => CheckedDiv::checked_div(a, b),
-        Operator::Rem => CheckedRem::checked_rem(a, b),
-        Operator::Abs => CheckedAbs::checked_abs(a),
-        Operator::Neg => CheckedNeg::checked_neg(a),
+        Operator::Add => CheckedAdd::checked_add(a, b).ok_or(Overflow),
+        Operator::Sub => CheckedSub::checked_sub(a, b).ok_or(Overflow),
+        Operator::Mul => CheckedMul::checked_mul(a, b).ok_or(Overflow),
+        Operator::Div => CheckedDiv::checked_div(a, b).ok_or(Overflow),
+        Operator::Rem => CheckedRem::checked_rem(a, b).ok_or(Overflow),
+        Operator::Abs => CheckedAbs::checked_abs(a).ok_or(AbsError),
+        Operator::Neg => CheckedNeg::checked_neg(a).ok_or(NegError),
     }
 }
 
-// Implementations on usize
-impl CheckedType for usize {}
-checked_impl_double!(CheckedAdd, checked_add, usize, Overflow);
-checked_impl_double!(CheckedSub, checked_sub, usize, Overflow);
-checked_impl_double!(CheckedMul, checked_mul, usize, Overflow);
-checked_impl_double!(CheckedDiv, checked_div, usize, Overflow);
-checked_impl_double!(CheckedRem, checked_rem, usize, Overflow);
-checked_impl_single!(CheckedNeg, checked_neg, usize, NegError);
-impl CheckedAbs for usize {
-    fn checked_abs(&self) -> Result<Self, ErrorCases> {
-        Ok(*self)
-    }
-}
+// Implementations on Primitive types
+checked_impl!(unsigned, u8);
+checked_impl!(unsigned, u16);
+checked_impl!(unsigned, u32);
+checked_impl!(unsigned, u64);
+checked_impl!(unsigned, usize);
 
-// Implementations on i32
-impl CheckedType for i32 {}
-checked_impl_double!(CheckedAdd, checked_add, i32, Overflow);
-checked_impl_double!(CheckedSub, checked_sub, i32, Overflow);
-checked_impl_double!(CheckedMul, checked_mul, i32, Overflow);
-checked_impl_double!(CheckedDiv, checked_div, i32, Overflow);
-checked_impl_double!(CheckedRem, checked_rem, i32, Overflow);
-checked_impl_single!(CheckedAbs, checked_abs, i32, AbsError);
-checked_impl_single!(CheckedNeg, checked_neg, i32, NegError);
+checked_impl!(int, i8);
+checked_impl!(int, i16);
+checked_impl!(int, i32);
+checked_impl!(int, i64);
+checked_impl!(int, isize);
