@@ -16,7 +16,7 @@
 // inside uses
 use parser_mod::xch_parser;
 use balancer_mod::xch_balancer;
-use public::CheckedType;
+use api::traits::CheckedType;
 
 /// the API balances the Chemical Equation by equation.
 /// It provides one balanced solution, but it may isn't the *most* correct solution (because it set all free variables = 1).

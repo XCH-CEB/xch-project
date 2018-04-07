@@ -13,11 +13,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-// Overall: This is the source code of the AlphaForce Balancer.
+// Overall: This is the source code of the Hyper Mathlib.
 
 // inside uses
-use handler::ErrorCases;
-use public::{safe_calc, CheckedType, Operator};
+use api::handler::ErrorCases;
+use api::traits::CheckedType;
+use public::{safe_calc, Operator};
 
 pub fn gcd<T: CheckedType + PartialEq>(mut a: T, mut b: T) -> Result<T, ErrorCases> {
     let mut t: T;

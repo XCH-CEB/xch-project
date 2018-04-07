@@ -13,15 +13,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-// Overall: This is the source code of the AlphaForce Balancer.
+// Overall: This is the source code of the Hyper Mathlib.
 
 use std::collections::HashMap;
 // inside uses
-use handler::{ErrorCases, ResultHandler};
-use handler::ErrorCases::Unsolvable;
-use handler::WarnCases::{FreeVariablesDetected, NoWarn};
+use api::handler::{ErrorCases, ResultHandler};
+use api::handler::ErrorCases::Unsolvable;
+use api::handler::WarnCases::{FreeVariablesDetected, NoWarn};
 use super::frac_util::Frac;
-use public::CheckedType;
+use api::traits::CheckedType;
 
 pub struct GaussianElimination<T: CheckedType> {
     matrix_a: Vec<Vec<Frac<T>>>, // A n*n matrix.

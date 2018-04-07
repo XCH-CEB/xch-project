@@ -15,19 +15,16 @@
 
 // Overall: This is the source code of the AlphaForce Balancer.
 
-mod gauss_eliminate;
-mod math_methods;
-mod frac_util;
-
 use std::vec::Vec;
 // inside uses
 use structs::ChemicalEquation;
-use handler::{ErrorCases, ResultHandler};
-use handler::ErrorCases::NoAnswer;
-use self::gauss_eliminate::GaussianElimination;
-use self::frac_util::Frac;
-use self::math_methods::nlcm;
-use public::{safe_calc, CheckedType, Operator};
+use api::handler::{ErrorCases, ResultHandler};
+use api::handler::ErrorCases::NoAnswer;
+use api::traits::CheckedType;
+use public::{safe_calc, Operator};
+use math_methods::gauss_eliminate::GaussianElimination;
+use math_methods::frac_util::Frac;
+use math_methods::basic_fns::nlcm;
 
 pub fn xch_balancer<T: CheckedType>(
     list: &[Vec<T>],

@@ -16,8 +16,8 @@
 // Overall: This is the source code of the Delta-3 Parser.
 
 // inside uses
-use handler::ErrorCases;
-use handler::ErrorCases::{IllegalEquation, MatchError};
+use api::handler::ErrorCases;
+use api::handler::ErrorCases::{IllegalEquation, MatchError};
 use public::{safe_calc, Operator};
 
 pub fn legal_check(equation: &str) -> Result<bool, ErrorCases> {

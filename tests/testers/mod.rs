@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-use lib_xch::handler::{handler_api, ErrorCases};
-use lib_xch::public::CheckedType;
+use lib_xch::api::handler::{handler_api, ErrorCases};
+use lib_xch::api::traits::CheckedType;
 
 pub fn tester<T: CheckedType>(equ: &str, v: &[T]) {
     let tmp = match handler_api::<T>(equ) {

@@ -18,9 +18,10 @@
 use std::collections::HashMap;
 // inside uses
 use super::get_token;
-use handler::ErrorCases;
-use handler::ErrorCases::NotFound;
-use public::{safe_calc, CheckedType, Operator};
+use api::handler::ErrorCases;
+use api::handler::ErrorCases::NotFound;
+use api::traits::CheckedType;
+use public::{safe_calc, Operator};
 
 pub struct FormulaDesc<T: CheckedType> {
     pub formula_self: String,

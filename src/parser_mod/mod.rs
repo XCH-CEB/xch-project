@@ -26,9 +26,10 @@ use std::vec::Vec;
 use structs::ChemicalEquation;
 use self::parser_struct::{FormulaDesc, TableDesc, TokenDesc};
 use self::legal_check_util::{legal_check, legal_check_brackets};
-use handler::ErrorCases;
-use handler::ErrorCases::{NoTokens, ParseError, SplitError};
-use public::{safe_calc, CheckedType, Operator};
+use api::handler::ErrorCases;
+use api::handler::ErrorCases::{NoTokens, ParseError, SplitError};
+use api::traits::CheckedType;
+use public::{safe_calc, Operator};
 
 pub fn xch_parser<T: CheckedType>(
     equation: &str,

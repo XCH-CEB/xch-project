@@ -13,16 +13,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-// Overall: This is the source code of the AlphaForce Balancer.
+// Overall: This is the source code of the Hyper Mathlib.
 
 use std::cmp::Ordering;
 use std::ops;
 // inside uses
-use super::math_methods::{gcd, lcm};
-use handler::ErrorCases::UndefinedFrac;
-use handler::ErrorCases;
+use super::basic_fns::{gcd, lcm};
+use api::handler::ErrorCases::UndefinedFrac;
+use api::handler::ErrorCases;
+use api::traits::CheckedType;
 use public::Operator::{Abs, Add, Div, Mul, Sub};
-use public::{safe_calc, CheckedType};
+use public::safe_calc;
 
 fn rfcd<T: CheckedType>(a: &Frac<T>, b: &Frac<T>) -> Result<(T, T, T), ErrorCases> {
     // reduction of fractions to a common denominator

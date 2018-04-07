@@ -18,7 +18,7 @@ extern crate lib_xch;
 mod testers;
 
 use testers::{tester, tester_error};
-use lib_xch::handler::ErrorCases::*;
+use lib_xch::api::handler::ErrorCases::*;
 
 #[test]
 fn simples() {
