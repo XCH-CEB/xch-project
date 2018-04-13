@@ -18,10 +18,15 @@ use parser_mod::xch_parser;
 use balancer_mod::xch_balancer;
 use api::traits::CheckedType;
 
-/// the API balances the Chemical Equation by equation.
+/// the API which balances the Chemical Equation by equation.
+///
 /// It provides one balanced solution, but it may isn't the *most* correct solution (because it set all free variables = 1).
+///
+/// You can use any type which implemented the trait `api::traits::CheckedType`
+///
 /// If the equation can balance, function would return a `T` vector which contains the answer.
-/// If not, it would return `handler::ErrorHandler` which contains Delta-3 the parser's result and error message.
+///
+/// If not, it would return `api::handler::ErrorHandler` which contains Delta-3 the parser's result and error message.
 ///
 /// # Panics
 ///
@@ -56,7 +61,8 @@ pub fn handler_api<T: CheckedType>(
     }
 }
 
-/// `ErrorHandler` returns when `handler::handler_api` failed somehow.
+/// `ErrorHandler` returns when `api::handler::handler_api` failed somehow.
+///
 /// **CAUTION: `parser_result` might empty if parser is failed.**
 pub struct ErrorHandler<T: CheckedType> {
     pub error_message: ErrorCases,
@@ -64,6 +70,7 @@ pub struct ErrorHandler<T: CheckedType> {
 }
 
 /// `ResultHandler` returns the balancer's result.
+///
 /// And it may contain warning message.
 pub struct ResultHandler<U> {
     pub warn_message: WarnCases,

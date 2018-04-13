@@ -34,7 +34,13 @@ pub struct TokenDesc<T: CheckedType> {
     pub times: T,
 }
 
-// Object-Oriented
+// This is the data structure of describing the result of Delta-3 Parser.
+// This is the form of the `list`:
+// |     \     | formula_1 | formula_2 | ...       | formula_n |
+// | element_1 | ...       | ...       | ...       | ...       |
+// | element_2 | ...       | ...       | ...       | ...       |
+// | ...       | ...       | ...       | ...       | ...       |
+// | element_n | ...       | ...       | ...       | ...       |
 pub struct TableDesc<T: CheckedType> {
     elements_table: HashMap<String, usize>, // store the index of elements
     list: Vec<Vec<T>>,

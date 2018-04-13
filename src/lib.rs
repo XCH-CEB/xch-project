@@ -15,6 +15,7 @@
 
 // Documentation
 //! This is the official library of xch-ceb.
+//!
 //! It can parse and balance *the Chemical Equation*.
 //!
 //! -  Unlimited brackets
@@ -22,7 +23,7 @@
 //!
 //! # Getting Started
 //!
-//! Just use the `handler_api`: ``lib_xch::handler::handler_api::<i32>("H2O=H2+O2");``
+//! Just use the `handler_api`: ``lib_xch::api::handler::handler_api::<i32>("H2O=H2+O2");``
 
 // extern crate(s)
 #[macro_use]
