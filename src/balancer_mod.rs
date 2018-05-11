@@ -17,14 +17,14 @@
 
 use std::vec::Vec;
 // inside uses
-use structs::ChemicalEquation;
-use api::handler::{ErrorCases, ResultHandler};
 use api::handler::ErrorCases::NoAnswer;
+use api::handler::{ErrorCases, ResultHandler};
 use api::traits::CheckedType;
-use public::{safe_calc, Operator};
-use math_methods::gauss_eliminate::GaussianElimination;
-use math_methods::frac_util::Frac;
 use math_methods::basic_fns::nlcm;
+use math_methods::frac_util::Frac;
+use math_methods::gauss_eliminate::GaussianElimination;
+use public::{safe_calc, Operator};
+use structs::ChemicalEquation;
 
 pub fn xch_balancer<T: CheckedType>(
     list: &[Vec<T>],

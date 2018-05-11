@@ -33,8 +33,8 @@ extern crate regex;
 
 // mods
 pub mod api;
-mod parser_mod;
 mod balancer_mod;
 mod math_methods;
-mod structs;
+mod parser_mod;
 mod public;
+mod structs;

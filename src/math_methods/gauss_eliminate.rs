@@ -17,10 +17,10 @@
 
 use std::collections::HashMap;
 // inside uses
-use api::handler::{ErrorCases, ResultHandler};
+use super::frac_util::Frac;
 use api::handler::ErrorCases::Unsolvable;
 use api::handler::WarnCases::{FreeVariablesDetected, NoWarn};
-use super::frac_util::Frac;
+use api::handler::{ErrorCases, ResultHandler};
 use api::traits::CheckedType;
 
 pub struct GaussianElimination<T: CheckedType> {

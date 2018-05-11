@@ -19,8 +19,8 @@ use std::cmp::Ordering;
 use std::ops;
 // inside uses
 use super::basic_fns::{gcd, lcm};
-use api::handler::ErrorCases::UndefinedFrac;
 use api::handler::ErrorCases;
+use api::handler::ErrorCases::UndefinedFrac;
 use api::traits::CheckedType;
 use public::Operator::{Abs, Add, Div, Mul, Sub};
 use public::safe_calc;

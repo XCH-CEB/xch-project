@@ -13,11 +13,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-use num_traits::ops::checked::{CheckedAdd, CheckedDiv, CheckedMul, CheckedSub};
+use num_traits::ops::checked::{CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg, CheckedRem,
+                               CheckedSub};
 // inside uses
-use api::handler::ErrorCases::{AbsError, NegError, Overflow};
 use api::handler::ErrorCases;
-use api::traits::{CheckedAbs, CheckedNeg, CheckedRem, CheckedType};
+use api::handler::ErrorCases::{AbsError, NegError, Overflow};
+use api::traits::{CheckedAbs, CheckedType};
 
 // Operator
 pub enum Operator {

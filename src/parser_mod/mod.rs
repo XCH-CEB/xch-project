@@ -23,13 +23,13 @@ use regex::Regex;
 use std::string::String;
 use std::vec::Vec;
 // inside uses
-use structs::ChemicalEquation;
-use self::parser_struct::{FormulaDesc, TableDesc, TokenDesc};
 use self::legal_check_util::{legal_check, legal_check_brackets};
+use self::parser_struct::{FormulaDesc, TableDesc, TokenDesc};
 use api::handler::ErrorCases;
 use api::handler::ErrorCases::{NoTokens, ParseError, SplitError};
 use api::traits::CheckedType;
 use public::{safe_calc, Operator};
+use structs::ChemicalEquation;
 
 pub fn xch_parser<T: CheckedType>(
     equation: &str,

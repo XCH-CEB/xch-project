@@ -14,9 +14,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // inside uses
-use parser_mod::xch_parser;
-use balancer_mod::xch_balancer;
 use api::traits::CheckedType;
+use balancer_mod::xch_balancer;
+use parser_mod::xch_parser;
 
 /// the API which balances the Chemical Equation by equation.
 ///
