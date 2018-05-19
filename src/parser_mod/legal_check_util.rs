@@ -17,7 +17,7 @@
 
 // inside uses
 use api::handler::ErrorCases;
-use api::handler::ErrorCases::{IllegalEquation, MatchError};
+use api::handler::ErrorCases::{IllegalEquation, IllegalUsage, MatchError};
 use public::{safe_calc, Operator};
 
 pub fn legal_check(equation: &str) -> Result<bool, ErrorCases> {
@@ -40,31 +40,36 @@ pub fn legal_check(equation: &str) -> Result<bool, ErrorCases> {
 pub fn legal_check_brackets(formula: &str) -> Result<bool, ErrorCases> {
     let formula = formula.chars().into_iter().collect::<Vec<_>>();
     for i in 0..formula.len() {
-        if formula[i] == '(' {
-            brackets_matcher(&formula, i, true)?;
-        }
-        if formula[i] == ')' {
-            brackets_matcher(&formula, i, false)?;
-        }
+        // In this case, it is only using `brackets_matcher`'s checking function.
+        // What it returns doesn't matter.
+        match formula[i] {
+            '(' => brackets_matcher(&formula, i, true)?,
+            ')' => brackets_matcher(&formula, i, false)?,
+            _ => 0,
+        };
     }
     Ok(true)
 }
 
 fn brackets_matcher(formula: &[char], pos: usize, mode: bool) -> Result<usize, ErrorCases> {
     let mut fake_stack = 0;
+    if (mode & (formula[pos] == ')')) || ((!mode) & (formula[pos] == '(')) {
+        return Err(IllegalUsage);
+    }
 
     if mode {
         for (i, item) in formula.iter().enumerate().skip(pos + 1) {
-            if *item == '(' {
-                fake_stack = safe_calc(&fake_stack, &1, &Operator::Add)?;
-            }
-            if *item == ')' {
-                if fake_stack == 0 {
-                    return Ok(i);
-                } else {
-                    fake_stack = safe_calc(&fake_stack, &1, &Operator::Sub)?;
+            match *item {
+                '(' => fake_stack = safe_calc(&fake_stack, &1, &Operator::Add)?,
+                ')' => {
+                    if fake_stack == 0 {
+                        return Ok(i);
+                    } else {
+                        fake_stack = safe_calc(&fake_stack, &1, &Operator::Sub)?;
+                    }
                 }
-            }
+                _ => (),
+            };
         }
     } else {
         for i in (0..pos).rev() {
@@ -84,17 +89,45 @@ fn brackets_matcher(formula: &[char], pos: usize, mode: bool) -> Result<usize, E
 }
 
 fn check_char(test: char) -> i32 {
-    if (test >= 'a') && (test <= 'z') {
-        1 // 'a'~'z'
-    } else if (test >= 'A') && (test <= 'Z') {
-        2 // 'A'~'Z'
-    } else if (test >= '0') && (test <= '9') {
-        3 // '0'~'9'
-    } else if (test == '(') || (test <= ')') {
-        4 // ( or )
-    } else if (test == '+') || (test == '=') {
-        5 // + or =
-    } else {
-        0 // nothing!
+    match test {
+        'a'...'z' => 1,
+        'A'...'Z' => 2,
+        '0'...'9' => 3,
+        '(' | ')' => 4,
+        '+' | '=' => 5,
+        _ => 0,
+    }
+}
+
+// unit tests
+#[cfg(test)]
+mod tests {
+    use super::{brackets_matcher, legal_check_brackets};
+    use api::handler::ErrorCases;
+
+    #[test]
+    fn check_brackets() {
+        assert_eq!(legal_check_brackets("(())"), Ok(true));
+        assert_eq!(legal_check_brackets("(()))"), Err(ErrorCases::MatchError));
+    }
+
+    #[test]
+    fn match_brackets() {
+        assert_eq!(
+            brackets_matcher(&['(', '(', '(', ')', ')', ')'], 2, false),
+            Err(ErrorCases::IllegalUsage)
+        );
+        assert_eq!(
+            brackets_matcher(&['(', '(', '(', ')', ')', ')'], 3, true),
+            Err(ErrorCases::IllegalUsage)
+        );
+        assert_eq!(
+            brackets_matcher(&['(', '(', '(', ')', ')', ')'], 2, true),
+            Ok(3)
+        );
+        assert_eq!(
+            brackets_matcher(&['(', '(', '('], 2, true),
+            Err(ErrorCases::MatchError)
+        );
     }
 }

@@ -105,6 +105,7 @@ pub enum ErrorCases {
     AbsError,
     NegError,
     UndefinedFrac,
+    IllegalUsage,
 }
 
 /// All the Warning Types.
