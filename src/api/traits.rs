@@ -21,7 +21,7 @@ use std::marker::Copy;
 use std::str::FromStr;
 
 // marcos for auto-creating implementations
-macro_rules! checked_impl_single {
+macro_rules! checked_impl_unary {
     ($trait_name:ident, $method:ident, $t:ty) => {
         impl $trait_name for $t {
             fn $method(&self) -> Option<$t> {
@@ -34,7 +34,7 @@ macro_rules! checked_impl_single {
 macro_rules! checked_impl {
     (int, $t:ty) => {
         impl CheckedType for $t {}
-        checked_impl_single!(CheckedAbs, checked_abs, $t);
+        checked_impl_unary!(CheckedAbs, checked_abs, $t);
     };
     (unsigned, $t:ty) => {
         impl CheckedType for $t {}

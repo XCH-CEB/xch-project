@@ -1,4 +1,4 @@
-# lib-xch-ceb
+# lib_xch
 [![Build Status](https://travis-ci.org/LEXUGE/lib-xch-ceb.svg?branch=master)](https://travis-ci.org/LEXUGE/lib-xch-ceb)  
 
 This is crate [xch-ceb](https://crates.io/crates/xch-ceb)'s official lib.  
@@ -6,9 +6,60 @@ This is crate [xch-ceb](https://crates.io/crates/xch-ceb)'s official lib.
 [lib_xch's documentation](https://docs.rs/lib_xch)  
 
 # Goals of this project
-Fast, Small, Safe.  
+Swift, Small, Safe.  
+
+# Getting Started
+First of all, you should pick a version.  
+At this time (2018), add following dependency to your `Cargo.toml`:  
+```
+[dependencies]
+lib_xch = "^0.7"
+```  
+**You can use the latest version number (e.g. v0.8) to replace v0.7**
+
+# Example
+The source code of [xch-ceb](https://crates.io/crates/xch-ceb/)
+```rust
+extern crate lib_xch;
+
+use lib_xch::api::handler::handler_api;
+use std::io;
+
+fn main() {
+    let equation = input();
+    match handler_api::<i32>(&equation) {
+        Ok(v) => {
+            println!("WARN: {:?}", v.warn_message);
+            print_ans(&v.result)
+        }
+        Err(f) => println!("{:?}", f.error_message),
+    };
+}
+
+// other functions
+fn input() -> String {
+    println!("[INPUT] Input the equation:");
+    let mut equation = String::new();
+    io::stdin()
+        .read_line(&mut equation)
+        .expect("[ERROR] Failed to read line!");
+    equation.pop();
+    equation
+}
+
+fn print_ans(traversal: &[i32]) {
+    println!("[OUTPUT]:");
+    for i in traversal {
+        print!("{} ", i);
+    }
+    println!(" ");
+}
+```
+
+# License
+Licensed under GPL-3.0
 
 # Plans
-- [x] Use regex-based parser
-- [x] Use Gaussian-Jordan Elimination
+- [x] Uses regex-based parser
+- [x] Uses Gaussian-Jordan Elimination
 - [ ] Two-core balancer
