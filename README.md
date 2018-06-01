@@ -14,7 +14,7 @@ At this time (2018), add following dependency to your `Cargo.toml`:
 ```
 [dependencies]
 lib_xch = "^0.7"
-```  
+```
 **You can use the latest version number (e.g. v0.8) to replace v0.7**
 
 # Example
@@ -62,4 +62,6 @@ Licensed under GPL-3.0
 # Plans
 - [x] Uses regex-based parser
 - [x] Uses Gaussian-Jordan Elimination
-- [ ] Two-core balancer
+- [ ] Implements the functions of [bce](https://github.com/bce-toolkit/bce)
+  - [ ] Implements AST-based parser
+  - [ ] Implements Generic-solution-supported balancer
