@@ -13,32 +13,25 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-use num_traits::ops::checked::{CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg, CheckedRem,
-                               CheckedSub};
+use num::traits::ops::checked::{CheckedAdd, CheckedMul, CheckedNeg, CheckedSub};
 // inside uses
 use api::handler::ErrorCases;
-use api::handler::ErrorCases::{AbsError, NegError, Overflow};
-use api::traits::{CheckedAbs, CheckedType};
+use api::handler::ErrorCases::{NegError, Overflow};
+use api::traits::CheckedCalc;
 
 // Operator
 pub enum Operator {
     Add,
     Sub,
     Mul,
-    Div,
-    Rem,
-    Abs,
     Neg,
 }
 
-pub fn safe_calc<T: CheckedType>(a: &T, b: &T, op: &Operator) -> Result<T, ErrorCases> {
+pub fn safe_calc<T: CheckedCalc>(a: &T, b: &T, op: &Operator) -> Result<T, ErrorCases> {
     match *op {
         Operator::Add => CheckedAdd::checked_add(a, b).ok_or(Overflow),
         Operator::Sub => CheckedSub::checked_sub(a, b).ok_or(Overflow),
         Operator::Mul => CheckedMul::checked_mul(a, b).ok_or(Overflow),
-        Operator::Div => CheckedDiv::checked_div(a, b).ok_or(Overflow),
-        Operator::Rem => CheckedRem::checked_rem(a, b).ok_or(Overflow),
-        Operator::Abs => CheckedAbs::checked_abs(a).ok_or(AbsError),
         Operator::Neg => CheckedNeg::checked_neg(a).ok_or(NegError),
     }
 }

@@ -16,12 +16,12 @@
 use lib_xch::api::handler::{handler_api, ErrorCases};
 use lib_xch::api::traits::CheckedType;
 
-pub fn tester<T: CheckedType>(equ: &str, v: &[T]) {
+pub fn tester<T: CheckedType>(equ: &str, v: &[&[T]]) {
     let tmp = match handler_api::<T>(equ) {
-        Ok(v) => v.result,
-        Err(e) => {
-            println!("{:?}", e.error_message);
-            panic!(e.error_message)
+        Ok(v) => v,
+        Err((e, _)) => {
+            println!("{:?}", e);
+            panic!(e)
         }
     };
     assert_eq!(tmp, v);
@@ -30,7 +30,7 @@ pub fn tester<T: CheckedType>(equ: &str, v: &[T]) {
 pub fn tester_error<T: CheckedType>(payload: &str, err: &ErrorCases) {
     let tmp = match handler_api::<T>(payload) {
         Ok(_) => panic!("Failed!"),
-        Err(s) => s.error_message,
+        Err((e, _)) => e,
     };
     assert_eq!(tmp, *err);
 }

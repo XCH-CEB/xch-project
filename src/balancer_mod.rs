@@ -15,73 +15,35 @@
 
 // Overall: This is the source code of the AlphaForce Balancer.
 
+use na::base::{Dynamic, MatrixMN};
+use num::rational::Ratio;
 use std::vec::Vec;
 // inside uses
-use api::handler::ErrorCases::NoAnswer;
-use api::handler::{ErrorCases, ResultHandler};
+use api::handler::ErrorCases;
 use api::traits::CheckedType;
-use math_methods::basic_fns::nlcm;
-use math_methods::frac_util::Frac;
 use math_methods::gauss_eliminate::GaussianElimination;
-use public::{safe_calc, Operator};
 use structs::ChemicalEquation;
 
 pub fn xch_balancer<T: CheckedType>(
     list: &[Vec<T>],
-    chmcl_f_sut: &ChemicalEquation,
-) -> Result<ResultHandler<Vec<T>>, ErrorCases> {
-    let mut equation_matrix: Vec<Vec<Frac<T>>> = Vec::new();
-    let result_matrix =
-        vec![Frac::new(T::zero(), T::one()); safe_calc(&list.len(), &1, &Operator::Sub)?];
-    for item in list.iter().skip(1) {
-        let mut v: Vec<Frac<T>> = Vec::new();
-        for item_j in item.iter()
-            .take(safe_calc(&chmcl_f_sut.left_num, &1, &Operator::Add)?)
-            .skip(1)
-        {
-            v.push(Frac::new(*item_j, T::one()));
-        }
-        for item_j in item.iter()
-            .take(safe_calc(&chmcl_f_sut.sum, &1, &Operator::Add)?)
-            .skip(safe_calc(&chmcl_f_sut.left_num, &1, &Operator::Add)?)
-        {
-            v.push(Frac::new(
-                safe_calc(item_j, &T::zero(), &Operator::Neg)?,
-                T::one(),
-            ));
-        }
-        equation_matrix.push(v);
-    }
-    let gauss_ans = GaussianElimination::<T>::new(
-        equation_matrix,
-        result_matrix,
-        safe_calc(&list.len(), &1, &Operator::Sub)?,
-        chmcl_f_sut.sum,
-    ).solve()?;
-    let int_set = &mut to_int_set(gauss_ans.result)?[..];
-    Ok(ResultHandler {
-        warn_message: gauss_ans.warn_message,
-        result: int_set.to_vec(),
-    })
-}
-
-fn to_int_set<T: CheckedType>(mut v: Vec<Frac<T>>) -> Result<Vec<T>, ErrorCases> {
-    let mut tmp: Vec<T> = Vec::new();
-    for i in &v {
-        tmp.push(i.denominator);
-    }
-    let lcm = nlcm(tmp)?;
-    let mut result: Vec<T> = Vec::new();
-    for i in &mut v {
-        i.numerator = safe_calc(
-            &i.numerator,
-            &safe_calc(&lcm, &i.denominator, &Operator::Div)?,
-            &Operator::Mul,
-        )?;
-        if i.numerator <= T::zero() {
-            return Err(NoAnswer);
-        }
-        result.push(i.numerator);
-    }
+    ce_desc: &ChemicalEquation,
+) -> Result<Vec<Vec<T>>, ErrorCases> {
+    let v = list
+        .iter()
+        .flat_map(|x| x)
+        .map(|x| Ratio::<T>::from_integer(*x))
+        .collect::<Vec<_>>();
+    let equation_matrix =
+        MatrixMN::<Ratio<T>, Dynamic, Dynamic>::from_row_slice(list.len(), ce_desc.sum, &v[..]);
+    let ans = GaussianElimination::<T>::new(equation_matrix).solve()?;
+    let result = ans
+        .into_iter()
+        .map(|v| {
+            let lcm: T = v.iter().fold(T::one(), |lcm, ratio| lcm.lcm(ratio.denom()));
+            v.into_iter()
+                .map(|ratio| lcm / *ratio.denom() * *ratio.numer())
+                .collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>();
     Ok(result)
 }

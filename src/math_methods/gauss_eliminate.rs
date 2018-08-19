@@ -15,64 +15,58 @@
 
 // Overall: This is the source code of the Hyper Mathlib.
 
-use std::collections::HashMap;
+use na::base::{Dynamic, MatrixMN};
+use num::rational::Ratio;
+use num::Signed;
+use num::{One, Zero};
 // inside uses
-use super::frac_util::Frac;
-use api::handler::ErrorCases::Unsolvable;
-use api::handler::WarnCases::{FreeVariablesDetected, NoWarn};
-use api::handler::{ErrorCases, ResultHandler};
+use api::handler::ErrorCases;
+use api::handler::ErrorCases::ZeroSolution;
 use api::traits::CheckedType;
 
 pub struct GaussianElimination<T: CheckedType> {
-    matrix_a: Vec<Vec<Frac<T>>>, // A n*n matrix.
-    matrix_b: Vec<Frac<T>>,      // A n*1 matrix.
+    matrix_a: MatrixMN<Ratio<T>, Dynamic, Dynamic>, // A n*m matrix.
     n: usize,
     m: usize,
 }
 
 impl<T: CheckedType> GaussianElimination<T> {
-    pub fn new(matrix_a: Vec<Vec<Frac<T>>>, matrix_b: Vec<Frac<T>>, n: usize, m: usize) -> Self {
+    pub fn new(matrix_a: MatrixMN<Ratio<T>, Dynamic, Dynamic>) -> Self {
         // Create a GaussianElimination Solution.
-        Self {
-            matrix_a,
-            matrix_b,
-            n,
-            m,
-        }
+        let (n, m) = matrix_a.shape();
+        Self { matrix_a, n, m }
     }
 
-    pub fn solve(&mut self) -> Result<ResultHandler<Vec<Frac<T>>>, ErrorCases> {
+    pub fn solve(mut self) -> Result<Vec<Vec<Ratio<T>>>, ErrorCases> {
         // The Gaussian-Jordan Algorithm
+        let mut var_table = Vec::<usize>::new();
         for i in 0..self.n {
-            let leftmosti = match self.get_leftmost_row(i) {
+            let mostleft_row = match self.get_leftmost_row(i) {
                 Some(s) => s,
                 None => continue,
             };
-            self.matrix_a.swap(i, leftmosti);
-            self.matrix_b.swap(i, leftmosti);
-            let j = match self.get_pivot(i) {
-                // if left most has no pivot, just continue.
-                Some(s) => s,
-                None => continue,
+            let j = match self.get_pivot(mostleft_row) {
+                Some(s) => {
+                    var_table.push(s);
+                    s
+                }
+                None => continue, // if most left row has no pivot, just continue.
             };
-            let maxi = self.get_max_abs_row(i, j)?;
-            if self.matrix_a[maxi][j].numerator != T::zero() {
-                self.matrix_a.swap(i, maxi);
-                self.matrix_b.swap(i, maxi); // swap row i and maxi in matrix_a and matrix_b
+            let max_row = self.get_max_abs_row(i, j);
+            if self.matrix_a[(max_row, j)] != Ratio::<T>::zero() {
+                self.matrix_a.swap_rows(i, max_row); // swap row i and maxi in matrix_a
                 {
-                    let tmp = self.matrix_a[i][j];
-                    self.divide_row(i, tmp)?;
+                    let tmp = &(self.matrix_a.row(i) / self.matrix_a[(i, j)]);
+                    self.matrix_a.row_mut(i).copy_from(tmp);
                 }
                 for u in i + 1..self.n {
-                    let v = self.mul_row(i, self.matrix_a[u][j])?; // v has n+1 elements
+                    let v = self.matrix_a.row(i) * self.matrix_a[(u, j)];
                     for (k, item) in v.iter().enumerate().take(self.m) {
-                        self.matrix_a[u][k] = (self.matrix_a[u][k] - (*item))?; // A_{u}=A_{u}-A_{u}{j}*A_{i}
+                        self.matrix_a[(u, k)] -= *item; // A_{u}=A_{u}-A_{u}{j}*A_{i}
                     }
-                    self.matrix_b[u] = (self.matrix_b[u] - v[self.m])?;
                 }
             }
         } // REF
-
         for i in (0..self.n).rev() {
             let j = match self.get_pivot(i) {
                 Some(s) => s,
@@ -80,56 +74,59 @@ impl<T: CheckedType> GaussianElimination<T> {
             };
             for u in (0..i).rev() {
                 // j above i
-                let v = self.mul_row(i, self.matrix_a[u][j])?; // v has n+1 elements
+                let v = self.matrix_a.row(i) * self.matrix_a[(u, j)];
                 for (k, item) in v.iter().enumerate().take(self.m) {
-                    self.matrix_a[u][k] = (self.matrix_a[u][k] - (*item))?; // A_{u}=A_{u}-A_{u}{j}*A_{i}
+                    self.matrix_a[(u, k)] -= *item; // A_{u}=A_{u}-A_{u}{j}*A_{i}
                 }
-                self.matrix_b[u] = (self.matrix_b[u] - v[self.m])?;
             }
         } // RREF
-        let mut ans: Vec<Frac<T>> = vec![Frac::new(T::zero(), T::one()); self.m];
-        let pivots = self.check()?;
-        let mut free_variable = false;
-        for i in (0..self.m).rev() {
-            if pivots.contains_key(&i) {
-                let mut sum = Frac::new(T::zero(), T::one());
-                for (k, item) in ans.iter().enumerate().take(self.m).skip(i + 1) {
-                    sum = (sum + (self.matrix_a[pivots[&i]][k] * (*item))?)?;
+        let v = (0..self.n)
+            .filter(|i| self.matrix_a.row(*i).iter().all(|e| e.is_zero()))
+            .collect::<Vec<_>>();
+        self = self.simplify(v); // eliminate the zero rows
+        var_table = (0..self.m)
+            .filter(|e| !var_table.contains(&e))
+            .collect::<Vec<_>>(); // get free variables table
+        var_table.iter().for_each(|x| {
+            let tmp = self.matrix_a.column(*x) * -Ratio::<T>::one();
+            self.matrix_a.column_mut(*x).copy_from(&tmp)
+        });
+        let mut ans = var_table
+            .iter()
+            .map(|i| self.matrix_a.column(*i).iter().cloned().collect::<Vec<_>>())
+            .collect::<Vec<_>>();
+        let len = var_table.len();
+        for (i, j) in var_table.into_iter().enumerate() {
+            for (v, item) in ans.iter_mut().enumerate().take(len) {
+                if i == v {
+                    item.insert(j, Ratio::<T>::one());
+                } else {
+                    item.insert(j, Ratio::<T>::zero());
                 }
-                ans[i] = ((self.matrix_b[pivots[&i]] - sum)? / self.matrix_a[pivots[&i]][i])?;
-            } else {
-                free_variable = true;
-                ans[i] = Frac::new(T::one(), T::one()); // set all free variables = 1/1.
             }
         }
-        Ok(ResultHandler {
-            warn_message: if free_variable {
-                FreeVariablesDetected
-            } else {
-                NoWarn
-            },
-            result: ans,
-        }) // x_{n} to x_{1}
+        if ans.is_empty() {
+            Err(ZeroSolution)
+        } else {
+            Ok(ans)
+        }
     }
 
-    fn check(&self) -> Result<HashMap<usize, usize>, ErrorCases> {
-        let mut pivots: HashMap<usize, usize> = HashMap::new();
-        for i in 0..self.n {
-            if self.get_pivot(i).is_some() {
-                pivots.insert(self.get_pivot(i).unwrap(), i); // safe unwrap
-            }
-            if self.matrix_a[i] == vec![Frac::new(T::zero(), T::one()); self.n + 1]
-                && self.matrix_b[i] != Frac::new(T::zero(), T::one())
-            {
-                return Err(Unsolvable);
-            }
+    fn simplify(mut self, list: Vec<usize>) -> Self {
+        for i in list.into_iter().rev() {
+            self.matrix_a = self.matrix_a.remove_row(i);
         }
-        Ok(pivots)
+        let (n, m) = self.matrix_a.shape();
+        Self {
+            matrix_a: self.matrix_a,
+            n,
+            m,
+        }
     }
 
     fn get_pivot(&self, row: usize) -> Option<usize> {
         for column in 0..self.m {
-            if self.matrix_a[row][column] != Frac::new(T::zero(), T::one()) {
+            if self.matrix_a[(row, column)] != Ratio::<T>::zero() {
                 return Some(column);
             }
         }
@@ -137,12 +134,13 @@ impl<T: CheckedType> GaussianElimination<T> {
     }
 
     fn get_leftmost_row(&self, row: usize) -> Option<usize> {
-        let mut fake_zero = false;
-        let mut leftmost = row;
+        let mut lock = false;
+        // Use `lock` to prevent calculation from `usize` Overflow
+        let mut mostleft_row = row;
         let mut min_left: usize = match self.get_pivot(row) {
             Some(s) => s,
             None => {
-                fake_zero = true;
+                lock = true;
                 0
             }
         };
@@ -151,43 +149,26 @@ impl<T: CheckedType> GaussianElimination<T> {
                 Some(s) => s,
                 None => continue,
             };
-            if (current_pivot < min_left) | (fake_zero) {
-                leftmost = i;
+            if (current_pivot < min_left) | (lock) {
+                mostleft_row = i;
                 min_left = current_pivot;
-                fake_zero = false;
+                lock = false;
             }
         }
-        if fake_zero {
+        if lock {
             None
         } else {
-            Some(leftmost)
+            Some(mostleft_row)
         }
     }
 
-    fn mul_row(&self, row: usize, multiplicator: Frac<T>) -> Result<Vec<Frac<T>>, ErrorCases> {
-        let mut v: Vec<Frac<T>> = Vec::new();
-        for column in 0..self.m {
-            v.push((self.matrix_a[row][column] * multiplicator)?);
-        }
-        v.push((self.matrix_b[row] * multiplicator)?);
-        Ok(v)
-    }
-
-    fn divide_row(&mut self, row: usize, divisor: Frac<T>) -> Result<bool, ErrorCases> {
-        for column in 0..self.m {
-            self.matrix_a[row][column] = (self.matrix_a[row][column] / divisor)?;
-        }
-        self.matrix_b[row] = (self.matrix_b[row] / divisor)?;
-        Ok(true)
-    }
-
-    fn get_max_abs_row(&self, row: usize, column: usize) -> Result<usize, ErrorCases> {
+    fn get_max_abs_row(&self, row: usize, column: usize) -> usize {
         let mut maxi = row;
         for k in row + 1..self.n {
-            if self.matrix_a[k][column].abs()? > self.matrix_a[maxi][column].abs()? {
+            if self.matrix_a[(k, column)].abs() > self.matrix_a[(maxi, column)].abs() {
                 maxi = k;
             }
         }
-        Ok(maxi)
+        maxi
     }
 }

@@ -21,7 +21,7 @@ use api::handler::ErrorCases::{IllegalEquation, IllegalUsage, MatchError};
 use public::{safe_calc, Operator};
 
 pub fn legal_check(equation: &str) -> Result<bool, ErrorCases> {
-    let equation = equation.chars().into_iter().collect::<Vec<_>>();
+    let equation = equation.chars().collect::<Vec<_>>();
     let mut tmp = 0;
     for i in equation {
         if check_char(i) == 0 {
@@ -38,7 +38,7 @@ pub fn legal_check(equation: &str) -> Result<bool, ErrorCases> {
 }
 
 pub fn legal_check_brackets(formula: &str) -> Result<bool, ErrorCases> {
-    let formula = formula.chars().into_iter().collect::<Vec<_>>();
+    let formula = formula.chars().collect::<Vec<_>>();
     for i in 0..formula.len() {
         // In this case, it is only using `brackets_matcher`'s checking function.
         // What it returns doesn't matter.

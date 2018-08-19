@@ -14,7 +14,7 @@ At this time (2018), add following dependency to your `Cargo.toml`:
 ```
 [dependencies]
 lib_xch = "^0.7"
-```
+```  
 **You can use the latest version number (e.g. v0.8) to replace v0.7**
 
 # Example
@@ -28,11 +28,8 @@ use std::io;
 fn main() {
     let equation = input();
     match handler_api::<i32>(&equation) {
-        Ok(v) => {
-            println!("WARN: {:?}", v.warn_message);
-            print_ans(&v.result)
-        }
-        Err(f) => println!("{:?}", f.error_message),
+        Ok(s) => println!("{:?}", s),
+        Err((e, _)) => println!("{:?}", e),
     };
 }
 
@@ -46,14 +43,6 @@ fn input() -> String {
     equation.pop();
     equation
 }
-
-fn print_ans(traversal: &[i32]) {
-    println!("[OUTPUT]:");
-    for i in traversal {
-        print!("{} ", i);
-    }
-    println!(" ");
-}
 ```
 
 # License
@@ -62,6 +51,5 @@ Licensed under GPL-3.0
 # Plans
 - [x] Uses regex-based parser
 - [x] Uses Gaussian-Jordan Elimination
-- [ ] Implements the functions of [bce](https://github.com/bce-toolkit/bce)
-  - [ ] Implements AST-based parser
-  - [ ] Implements Generic-solution-supported balancer
+- [x] Provides the set of Basic Solutions
+- [ ] Uses AST-based parser

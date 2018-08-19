@@ -15,6 +15,4 @@
 
 // Overall: This is the source code of the Hyper Mathlib.
 
-pub mod basic_fns;
-pub mod frac_util;
 pub mod gauss_eliminate;

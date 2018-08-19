@@ -20,15 +20,21 @@
 //!
 //! -  Unlimited brackets
 //! -  No Periodic table of the elements needed
+//! -  Provides the set of Basic Solutions instead of only one solution.
 //!
 //! # Getting Started
 //!
-//! Just use the `handler_api`: ``lib_xch::api::handler::handler_api::<i32>("H2O=H2+O2");``
+//! ```
+//! lib_xch::api::handler::handler_api::<i32>("H2O=H2+O2");
+//! ```
+
+#![deny(missing_docs)]
 
 // extern crate(s)
 #[macro_use]
 extern crate lazy_static;
-extern crate num_traits;
+extern crate nalgebra as na;
+extern crate num;
 extern crate regex;
 
 // mods

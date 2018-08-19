@@ -48,14 +48,16 @@ pub struct TableDesc<T: CheckedType> {
 }
 
 impl<T: CheckedType> TableDesc<T> {
-    pub fn store_in_table(&mut self, formula: &str, location: usize) -> Result<bool, ErrorCases> {
-        for t in get_token(formula)? {
+    pub fn store_in_table(
+        &mut self,
+        formula: &str,
+        location: usize,
+        neg: bool,
+    ) -> Result<bool, ErrorCases> {
+        for mut t in get_token(formula)? {
             if !self.elements_table.contains_key(&t.token_name) {
                 let len = self.elements_table.len();
-                self.elements_table.insert(
-                    t.token_name.clone(),
-                    safe_calc(&len, &1, &Operator::Add)?, // WARN: the elements_table[0].num will be 1
-                );
+                self.elements_table.insert(t.token_name.clone(), len);
                 self.update_list_vec();
             }
 
@@ -65,6 +67,9 @@ impl<T: CheckedType> TableDesc<T> {
                     Some(s) => *s,
                     None => return Err(NotFound),
                 }; // It have been checked.
+                if neg {
+                    t.times = safe_calc(&t.times, &T::zero(), &Operator::Neg)?
+                }
                 self.list[tmp][location] =
                     safe_calc(&self.list[tmp][location], &t.times, &Operator::Add)?;
             }
@@ -91,10 +96,6 @@ impl<T: CheckedType> TableDesc<T> {
     }
 
     fn generate_vec(&self) -> Vec<T> {
-        let mut v: Vec<T> = Vec::new();
-        for _ in 0..self.formula_sum + 1 {
-            v.push(T::zero());
-        }
-        v
+        vec![T::zero(); self.formula_sum]
     }
 }

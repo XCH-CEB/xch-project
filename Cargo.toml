@@ -1,6 +1,6 @@
 [package]
 name = "lib_xch"
-version = "0.7.2"
+version = "0.8.0"
 authors = ["LEXUGE <LEXUGEyky@outlook.com>"]
 description = "Crate xch-ceb's official lib"
 license = "GPL-3.0"
@@ -9,5 +9,6 @@ readme = "README.md"
 
 [dependencies]
 lazy_static = "^1.0"
-regex = "^0.2"
-num-traits = "^0.2"
+regex = "^1.0"
+num = "^0.2"
+nalgebra = "^0.16"

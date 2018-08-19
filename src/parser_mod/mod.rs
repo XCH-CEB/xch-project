@@ -35,22 +35,21 @@ pub fn xch_parser<T: CheckedType>(
     equation: &str,
 ) -> Result<(ChemicalEquation, Vec<Vec<T>>), ErrorCases> {
     legal_check(equation)?;
-    let mut chemical_equation_struct = ChemicalEquation {
-        left_num: 0,
-        right_num: 0,
+    let mut ce_desc = ChemicalEquation {
+        left: 0,
+        right: 0,
         sum: 0,
     };
     {
-        // block to get chemical_equation_struct.sum
+        // block to get ce_desc.sum
         let v: Vec<&str> = equation.split('=').collect();
         let equation_left: String = String::from(v[0]);
         let equation_right: String = String::from(v[1]);
         let tmp1 = parser_get_sum(&equation_left)?;
         let tmp2 = parser_get_sum(&equation_right)?;
-        chemical_equation_struct.sum = safe_calc(&tmp1, &tmp2, &Operator::Add)?;
+        ce_desc.sum = safe_calc(&tmp1, &tmp2, &Operator::Add)?;
     }
-    let mut table = TableDesc::new(chemical_equation_struct.sum);
-    table.update_list_vec(); // first access will be like list[1][1]
+    let mut table = TableDesc::new(ce_desc.sum);
 
     {
         // block to call parsers
@@ -58,16 +57,12 @@ pub fn xch_parser<T: CheckedType>(
         let equation_left: String = String::from(v[0]);
         let equation_right: String = String::from(v[1]);
 
-        chemical_equation_struct.left_num = part_parser(&equation_left, &mut table, 0)?;
-        chemical_equation_struct.right_num = part_parser(
-            &equation_right,
-            &mut table,
-            chemical_equation_struct.left_num,
-        )?;
+        ce_desc.left = part_parser(&equation_left, &mut table, 0, false)?;
+        ce_desc.right = part_parser(&equation_right, &mut table, ce_desc.left, true)?;
     }
 
     // return
-    Ok((chemical_equation_struct, table.get_list()))
+    Ok((ce_desc, table.get_list()))
 }
 
 fn parser_get_sum(equation: &str) -> Result<usize, ErrorCases> {
@@ -82,12 +77,13 @@ fn part_parser<T: CheckedType>(
     equation: &str,
     table: &mut TableDesc<T>,
     begin: usize,
+    neg: bool,
 ) -> Result<usize, ErrorCases> {
     let mut sum = begin;
     for formula in equation.split('+') {
         sum = safe_calc(&sum, &1, &Operator::Add)?;
         legal_check_brackets(&formula.to_string())?;
-        parser_formula(&formula.to_string(), table, sum)?;
+        parser_formula(&formula.to_string(), table, sum, neg)?;
     }
     Ok(sum - begin)
 }
@@ -170,6 +166,7 @@ fn parser_formula<T: CheckedType>(
     formula: &str,
     table: &mut TableDesc<T>,
     location: usize,
+    neg: bool,
 ) -> Result<bool, ErrorCases> {
     let formula_backup = formula;
     let mut formula = format!("({})", formula_backup);
@@ -180,6 +177,6 @@ fn parser_formula<T: CheckedType>(
             formula = replace_phrase(&formula, &p.all, &(mul_phrase(&p)?));
         }
     }
-    table.store_in_table(&formula, location)?;
+    table.store_in_table(&formula, location - 1, neg)?;
     Ok(true)
 }

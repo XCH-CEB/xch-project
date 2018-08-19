@@ -13,107 +13,66 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+//! The major part of APIs.
+
 // inside uses
 use api::traits::CheckedType;
 use balancer_mod::xch_balancer;
 use parser_mod::xch_parser;
 
-/// the API which balances the Chemical Equation by equation.
+// type aliases
+type Error<T> = (ErrorCases, Vec<Vec<T>>);
+
+/// The API which balances the Chemical Equation by equation.
 ///
-/// It provides one balanced solution, but it may isn't the *most* correct solution (because it set all free variables = 1).
+/// It provides a set of Basic Solutions. You can get infinite number of solutions by doing linear combination on the Basic Solution Set.
 ///
 /// You can use any type which implemented the trait `api::traits::CheckedType`
 ///
-/// If the equation can balance, function would return a `T` vector which contains the answer.
+/// If the equation can balance, function would return a `Vec<Vec<T>>` which contains the answer.
 ///
-/// If not, it would return `api::handler::ErrorHandler` which contains Delta-3 the parser's result and error message.
+/// If not, it would return `Err((ErrorCases, Vec<Vec<T>>))` which contains the error message and Delta-3 the parser's result.
 ///
 /// # Panics
 ///
 /// The equation you provided should be a common unbalanced chemical equation which only contains **one** `=`.
 ///
 /// -  Stack Overflow may cause **panic**. Because it is using regex-based parser.
-/// -  The implement for `PartialOrd` and `PartialEq` trait may cause **panic**. Because it should return `Ordering`.
+/// -  A large number (bigger than [`usize::MAX`](https://doc.rust-lang.org/nightly/std/usize/constant.MAX.html)) of formula may cause **panic**. Because it is using `Vec`.
 ///
-/// And in the other failed situation, it'll return a `error_message` and contain `parser_result`(maybe it is empty).
-pub fn handler_api<T: CheckedType>(
-    equation: &str,
-) -> Result<ResultHandler<Vec<T>>, ErrorHandler<T>> {
-    // T is successful traversal vector, E is list vector which parser returned.
-    let (chemical_equation_struct, list) = match xch_parser(equation) {
+/// And in the other failed situation, it'll return  `ErrorCases` and  parser's result (maybe it is empty).
+pub fn handler_api<T: CheckedType>(equation: &str) -> Result<Vec<Vec<T>>, Error<T>> {
+    let (ce_desc, list) = match xch_parser(equation) {
         Ok(s) => s,
-        Err(e) => {
-            return Err(ErrorHandler {
-                error_message: e,
-                parser_result: {
-                    let list: Vec<Vec<T>> = Vec::new();
-                    list
-                },
-            })
-        }
+        Err(e) => return Err((e, Vec::new())),
     };
-    match xch_balancer(&list, &chemical_equation_struct) {
+    match xch_balancer(&list, &ce_desc) {
         Ok(s) => Ok(s),
-        Err(e) => Err(ErrorHandler {
-            error_message: e,
-            parser_result: list,
-        }),
+        Err(e) => Err((e, list)),
     }
 }
 
-/// `ErrorHandler` returns when `api::handler::handler_api` failed somehow.
-///
-/// **CAUTION: `parser_result` might empty if parser is failed.**
-pub struct ErrorHandler<T: CheckedType> {
-    pub error_message: ErrorCases,
-    pub parser_result: Vec<Vec<T>>,
-}
-
-/// `ResultHandler` returns the balancer's result.
-///
-/// And it may contain warning message.
-pub struct ResultHandler<U> {
-    pub warn_message: WarnCases,
-    pub result: U,
-}
-
 /// All the Error Types.
-///
-/// -  more or less than 1 `=` or not allowed chars.
-/// -  overflow.
-/// -  brackets are not matched.
-/// -  no formulas to split.
-/// -  no tokens to get.
-/// -  not found in `elements_table`.
-/// -  no answer.
-/// -  Can't parse into `T`.
-/// -  Equation set unsolvable.
-/// -  `checked_abs()` error.
-/// -  `checked_neg()` error.
-/// -  The denominator of a fraction is 0.
 #[derive(PartialEq, Debug)]
 pub enum ErrorCases {
+    /// More or less than 1 `=` or not allowed chars.
     IllegalEquation,
+    /// Overflow.
     Overflow,
+    /// Brackets are not matched.
     MatchError,
+    /// No formulas to split.
     SplitError,
+    /// No tokens to get.
     NoTokens,
+    /// Not found in `elements_table`.
     NotFound,
-    NoAnswer,
+    /// Can't parse into `T`.
     ParseError,
-    Unsolvable,
-    AbsError,
+    /// `checked_neg()` error.
     NegError,
-    UndefinedFrac,
+    /// Internal Error - Illegal Usage was happened.
     IllegalUsage,
-}
-
-/// All the Warning Types.
-///
-/// -  Free variables detected, result may be wrong.
-/// -  No warning.
-#[derive(PartialEq, Debug)]
-pub enum WarnCases {
-    FreeVariablesDetected,
-    NoWarn,
+    /// Only the [zero solution](http://www.mathwords.com/t/trivial.htm) can be found.
+    ZeroSolution,
 }

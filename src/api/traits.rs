@@ -13,72 +13,58 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-use num_traits::Num;
-use num_traits::ops::checked::{CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg, CheckedRem,
-                               CheckedSub};
-use std::fmt::Debug;
+//! The traits which may be useful.
+
+use na::base::Scalar;
+use num::traits::ops::checked::{CheckedAdd, CheckedMul, CheckedNeg, CheckedSub};
+use num::traits::Num;
+use num::traits::NumAssign;
+use num::{Integer, Signed};
+// inside uses
+use std::fmt::Display;
 use std::marker::Copy;
 use std::str::FromStr;
 
 // marcos for auto-creating implementations
-macro_rules! checked_impl_unary {
-    ($trait_name:ident, $method:ident, $t:ty) => {
-        impl $trait_name for $t {
-            fn $method(&self) -> Option<$t> {
-                <$t>::$method(*self)
-            }
-        }
+macro_rules! checked_calc_impl {
+    ($t:ty) => {
+        impl CheckedCalc for $t {}
     };
 }
 
-macro_rules! checked_impl {
-    (int, $t:ty) => {
+macro_rules! checked_type_impl {
+    ($t:ty) => {
         impl CheckedType for $t {}
-        checked_impl_unary!(CheckedAbs, checked_abs, $t);
-    };
-    (unsigned, $t:ty) => {
-        impl CheckedType for $t {}
-        impl CheckedAbs for $t {
-            fn checked_abs(&self) -> Option<Self> {
-                Some(*self)
-            }
-        }
     };
 }
 
-/// This is the trait for `safe_calc` and whole lib's 'meta-calc-part'.
+/// The trait which must be implemented when using `safe_calc()`
+pub trait CheckedCalc: CheckedAdd + CheckedSub + CheckedMul + CheckedNeg {
+    // Empty
+}
+
+/// The trait which must be implemented.
 pub trait CheckedType:
-    Num
-    + Copy
-    + Debug
-    + Ord
-    + FromStr
-    + ToString
-    + Clone
-    + CheckedAdd
-    + CheckedSub
-    + CheckedMul
-    + CheckedDiv
-    + CheckedRem
-    + CheckedAbs
-    + CheckedNeg
+    Num + Copy + FromStr + CheckedCalc + Integer + Scalar + Signed + NumAssign + Display
 {
     // Empty
 }
 
-pub trait CheckedAbs: Sized {
-    fn checked_abs(&self) -> Option<Self>;
-}
-
 // Implementations on Primitive types
-checked_impl!(unsigned, u8);
-checked_impl!(unsigned, u16);
-checked_impl!(unsigned, u32);
-checked_impl!(unsigned, u64);
-checked_impl!(unsigned, usize);
+checked_calc_impl!(u8);
+checked_calc_impl!(u16);
+checked_calc_impl!(u32);
+checked_calc_impl!(u64);
+checked_calc_impl!(usize);
 
-checked_impl!(int, i8);
-checked_impl!(int, i16);
-checked_impl!(int, i32);
-checked_impl!(int, i64);
-checked_impl!(int, isize);
+checked_calc_impl!(i8);
+checked_calc_impl!(i16);
+checked_calc_impl!(i32);
+checked_calc_impl!(i64);
+checked_calc_impl!(isize);
+
+checked_type_impl!(i8);
+checked_type_impl!(i16);
+checked_type_impl!(i32);
+checked_type_impl!(i64);
+checked_type_impl!(isize);

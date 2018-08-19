@@ -22,31 +22,70 @@ use testers::{tester, tester_error};
 
 #[test]
 fn simples() {
-    tester::<i32>("H2O=H2+O2", &[2, 2, 1]);
-    tester::<i32>("Al+Fe3O4=Fe+Al2O3", &[8, 3, 9, 4]);
-    tester::<i32>("FeS2+O2=Fe2O3+SO2", &[4, 11, 2, 8]);
-    tester::<i32>("As2O3+Zn+HCl=AsH3+ZnCl2+H2O", &[1, 6, 12, 2, 6, 3]);
-    tester::<i32>("ABCDE=ABCDE", &[1, 1]);
+    tester::<i32>("H2O=H2+O2", &[&[2, 2, 1]]);
+    tester::<i32>("Al+Fe3O4=Fe+Al2O3", &[&[8, 3, 9, 4]]);
+    tester::<i32>("FeS2+O2=Fe2O3+SO2", &[&[4, 11, 2, 8]]);
+    tester::<i32>("As2O3+Zn+HCl=AsH3+ZnCl2+H2O", &[&[1, 6, 12, 2, 6, 3]]);
+    tester::<i32>("ABCDE=ABCDE", &[&[1, 1]]);
     tester::<i32>(
         "K4Fe(CN)6+H2SO4+H2O=K2SO4+FeSO4+(NH4)2SO4+CO",
-        &[1, 6, 6, 2, 1, 3, 6],
+        &[&[1, 6, 6, 2, 1, 3, 6]],
     );
-    tester::<i32>("Al2(SO4)3+NaOH=Na2SO4+Al(OH)3", &[1, 6, 3, 2]);
-    tester::<i32>("CuSO4+NaOH=Na2SO4+Cu(OH)2", &[1, 2, 1, 1]);
-    tester::<i32>("Fe(OH)3+H2SO4=Fe2(SO4)3+H2O", &[2, 3, 1, 6]);
+    tester::<i32>("Al2(SO4)3+NaOH=Na2SO4+Al(OH)3", &[&[1, 6, 3, 2]]);
+    tester::<i32>("CuSO4+NaOH=Na2SO4+Cu(OH)2", &[&[1, 2, 1, 1]]);
+    tester::<i32>("Fe(OH)3+H2SO4=Fe2(SO4)3+H2O", &[&[2, 3, 1, 6]]);
+    tester::<i32>(
+        "KClO3+HCl=KCl+ClO2+Cl2+H2O",
+        &[&[-4, 0, -4, -6, 3, 0], &[5, 6, 5, 6, 0, 3]],
+    );
+    tester::<i32>(
+        "Cu+HNO3=Cu(NO3)2+NO+NO2+H2O",
+        &[&[-1, 0, -1, -2, 4, 0], &[3, 8, 3, 2, 0, 4]],
+    );
+    tester::<i32>(
+        "HOC6H2(NO2)2SO3H+NH4OH=HOC6H2(NO2)2SO3NH4+H2O",
+        &[&[1, 1, 1, 1]],
+    );
+    tester::<i32>(
+        "K2Cr2O7+CH3CH2OH+H2SO4=Cr2(SO4)3+CH3COOH+K2SO4+H2O",
+        &[&[2, 3, 8, 2, 3, 2, 11]],
+    );
+    tester::<i32>(
+        "CoSO4+BaCO3+HCN=Ba3(Co(CN)6)2+BaSO4+H2SO4+CO2+H2+H2O",
+        &[
+            &[2, 0, 12, 1, -3, 5, 0, 1, 0],
+            &[0, 1, 0, 0, 1, -1, 1, 0, 1],
+        ],
+    );
+    tester::<i32>(
+        "Co(NO3)2+KNO2+CH3COOH=CH3COOK+K3(Co(NO2)6)+KNO3+NO+H2O",
+        &[&[-1, -4, 0, 0, -1, -1, 1, 0], &[2, 11, 2, 2, 2, 3, 0, 1]],
+    );
+    tester::<i32>(
+        "Co(NO3)2+(NH4)2CO2+NH3+O2=NH4NO3+Co(NH3)4CO3NO3+H2O",
+        &[&[4, 4, 8, -1, 2, 4, 0], &[0, 0, 2, 2, 1, 0, 1]],
+    );
+}
+
+#[test]
+fn special_solutions() {
+    tester_error::<i32>("A=B", &ZeroSolution);
+    tester::<i32>("A+A=B", &[&[-1, 1, 0]]);
+    tester::<i32>("A+A=A+B", &[&[-1, 1, 0, 0], &[1, 0, 1, 0]]);
+    tester::<i32>("A+A=AA+B", &[&[-1, 1, 0, 0], &[2, 0, 1, 0]]);
 }
 
 #[test]
 fn high_performance() {
     tester::<i32>(
         "H2+Ca(CN)2+NaAlF4+FeSO4+MgSiO3+KI+H3PO4+PbCrO4+BrCl+CF2Cl2+SO2=PbBr2+CrCl3+MgCO3+KAl(OH)4+Fe(SCN)3+PI3+Na2SiO3+CaF2+H2O",
-        &[88, 15, 6, 10, 3, 6, 2, 6, 12, 3, 20, 6, 6, 3, 6, 10, 2, 3, 15, 79],
+        &[&[88, 15, 6, 10, 3, 6, 2, 6, 12, 3, 20, 6, 6, 3, 6, 10, 2, 3, 15, 79]],
     );
 }
 
 #[test]
 fn brackets() {
-    tester::<i32>("O2(O3(O)4O5(O))=O", &[1, 15]);
+    tester::<i32>("O2(O3(O)4O5(O))=O", &[&[1, 15]]);
 }
 
 #[test]
@@ -80,25 +119,6 @@ fn no_tokens() {
 #[test]
 fn not_found() {
     // No example yet.
-}
-
-#[test]
-fn abs_error() {
-    // No example yet.
-}
-
-#[test]
-fn unsolvable() {
-    // No example yet.
-}
-
-#[test]
-fn no_answer() {
-    tester_error::<i32>("A=B", &NoAnswer);
-    tester_error::<i32>("A+A=B", &NoAnswer); // issue #1
-    tester_error::<i32>("A+A=A+B", &NoAnswer); // issue #1
-    tester_error::<i32>("A+A=AA+B", &NoAnswer); // issue #1
-    tester_error::<i32>("KClO3+HCl=KCl+ClO2+Cl2+H2O", &NoAnswer); // INP Model can't solve it.
 }
 
 #[test]
