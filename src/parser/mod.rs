@@ -13,36 +13,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-// Documentation
-//! This is the official library of xch-ceb.
-//!
-//! It can parse and balance *the Chemical Equation*.
-//!
-//! -  Unlimited brackets
-//! -  No Periodic table of the elements needed
-//! -  Provides the set of Basic Solutions instead of only one solution.
-//!
-//! # Getting Started
-//!
-//! ```
-//! lib_xch::api::handler::handler_api::<i32>("H2O=H2+O2");
-//! ```
-
-#![deny(missing_docs)]
-
-#[cfg(debug_assertions)]
-const _GRAMMAR: &str = include_str!("ast.pest");
-
-// extern crate(s)
-extern crate id_tree;
-extern crate nalgebra as na;
-extern crate num;
-extern crate pest;
-#[macro_use]
-extern crate pest_derive;
+// Overall: This is the source code of the Delta-3 Parser.
 
 // mods
-pub mod api;
-mod balancer;
-mod parser;
-mod public;
+mod ast;
+mod atomdict;
+mod datastructure;
+pub mod handler;

@@ -17,22 +17,10 @@
 
 use std::collections::HashMap;
 // inside uses
-use super::get_token;
+use super::atomdict::AtomDict;
 use api::handler::ErrorCases;
-use api::handler::ErrorCases::NotFound;
 use api::traits::CheckedType;
 use public::{safe_calc, Operator};
-
-pub struct FormulaDesc<T: CheckedType> {
-    pub formula_self: String,
-    pub times: T,
-    pub all: String,
-}
-
-pub struct TokenDesc<T: CheckedType> {
-    pub token_name: String,
-    pub times: T,
-}
 
 // This is the data structure of describing the result of Delta-3 Parser.
 // This is the form of the `list`:
@@ -50,52 +38,44 @@ pub struct TableDesc<T: CheckedType> {
 impl<T: CheckedType> TableDesc<T> {
     pub fn store_in_table(
         &mut self,
-        formula: &str,
+        atomdict: &AtomDict<T>,
         location: usize,
         neg: bool,
-    ) -> Result<bool, ErrorCases> {
-        for mut t in get_token(formula)? {
-            if !self.elements_table.contains_key(&t.token_name) {
+    ) -> Result<(), ErrorCases> {
+        for (k, v) in atomdict.get_dict().iter() {
+            if !self.elements_table.contains_key(k) {
                 let len = self.elements_table.len();
-                self.elements_table.insert(t.token_name.clone(), len);
-                self.update_list_vec();
+                self.elements_table.insert(k.to_string(), len);
+                self.list.push(generate_vec(self.formula_sum));
             }
-
-            {
-                // store data in table
-                let tmp = match self.elements_table.get(&t.token_name) {
-                    Some(s) => *s,
-                    None => return Err(NotFound),
-                }; // It have been checked.
-                if neg {
-                    t.times = safe_calc(&t.times, &T::zero(), &Operator::Neg)?
-                }
-                self.list[tmp][location] =
-                    safe_calc(&self.list[tmp][location], &t.times, &Operator::Add)?;
-            }
+            // store data in table
+            let value = if neg {
+                safe_calc(v, &T::zero(), &Operator::Neg)?
+            } else {
+                *v
+            };
+            self.list[self.elements_table[k]][location] = safe_calc(
+                &self.list[self.elements_table[k]][location],
+                &value,
+                &Operator::Add,
+            )?;
         }
-        Ok(true)
+        Ok(())
     }
 
     pub fn get_list(&self) -> Vec<Vec<T>> {
         (self.list).to_vec()
     }
 
-    pub fn new(sum: usize) -> Self {
-        // PLEASE call update_list_vec after new!
+    pub fn new(formula_sum: usize) -> Self {
         Self {
             elements_table: HashMap::new(),
             list: Vec::new(),
-            formula_sum: sum,
+            formula_sum,
         }
     }
+}
 
-    pub fn update_list_vec(&mut self) {
-        let v = self.generate_vec();
-        self.list.push(v);
-    }
-
-    fn generate_vec(&self) -> Vec<T> {
-        vec![T::zero(); self.formula_sum]
-    }
+fn generate_vec<T: CheckedType>(capacity: usize) -> Vec<T> {
+    vec![T::zero(); capacity]
 }

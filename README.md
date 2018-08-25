@@ -52,4 +52,4 @@ Licensed under GPL-3.0
 - [x] Uses regex-based parser
 - [x] Uses Gaussian-Jordan Elimination
 - [x] Provides the set of Basic Solutions
-- [ ] Uses AST-based parser
+- [x] Uses AST-based parser

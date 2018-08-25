@@ -1,0 +1,26 @@
+whitespace = _{ " " }
+comment = _{ "/*" ~ (!"*/" ~ any)* ~ "*/" }
+// base
+lalpha = { 'a'..'z' }
+ualpha = { 'A'..'Z' }
+digit = { '0'..'9' }
+num = @{ digit+ }
+
+// atom
+atom_name = @{ ualpha ~ (lalpha*) }
+atom = { atom_name ~ (num?) }
+
+// electron
+sign = { "+" | "-" }
+electron = { "<" ~ (num?) ~ "e" ~ sign ~ ">" }
+
+// parenthesis wrapper
+parenthesis_wrapper = { "(" ~ (molecule_group) ~ ")" ~ (num?) }
+
+// molecule and its group
+molecule = { (num?) ~ ((atom | parenthesis_wrapper)+) ~ (electron?)}
+molecule_group = { molecule ~ (("." ~ molecule)*) }
+
+// main
+exp = { molecule_group ~ (("+" ~ molecule_group)*) }
+equ = _{ soi ~ exp ~ "=" ~ exp ~ eoi }

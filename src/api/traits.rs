@@ -16,7 +16,7 @@
 //! The traits which may be useful.
 
 use na::base::Scalar;
-use num::traits::ops::checked::{CheckedAdd, CheckedMul, CheckedNeg, CheckedSub};
+use num::traits::ops::checked::{CheckedAdd, CheckedNeg};
 use num::traits::Num;
 use num::traits::NumAssign;
 use num::{Integer, Signed};
@@ -39,7 +39,7 @@ macro_rules! checked_type_impl {
 }
 
 /// The trait which must be implemented when using `safe_calc()`
-pub trait CheckedCalc: CheckedAdd + CheckedSub + CheckedMul + CheckedNeg {
+pub trait CheckedCalc: CheckedAdd + CheckedNeg {
     // Empty
 }
 

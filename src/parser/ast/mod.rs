@@ -13,27 +13,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-use num::traits::ops::checked::{CheckedAdd, CheckedNeg};
-// inside uses
-use api::handler::ErrorCases;
-use api::handler::ErrorCases::{NegError, Overflow};
-use api::traits::CheckedCalc;
+// Overall: This is the source code of the Delta-3 Parser.
 
-// Operator
-pub enum Operator {
-    Add,
-    Neg,
-}
-
-pub fn safe_calc<T: CheckedCalc>(a: &T, b: &T, op: &Operator) -> Result<T, ErrorCases> {
-    match *op {
-        Operator::Add => CheckedAdd::checked_add(a, b).ok_or(Overflow),
-        Operator::Neg => CheckedNeg::checked_neg(a).ok_or(NegError),
-    }
-}
-
-pub struct ChemicalEquation {
-    pub left: usize,
-    pub right: usize,
-    pub sum: usize,
-}
+mod node;
+mod tree;
+pub mod treebuilder;

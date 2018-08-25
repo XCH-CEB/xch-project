@@ -17,8 +17,8 @@
 
 // inside uses
 use api::traits::CheckedType;
-use balancer_mod::xch_balancer;
-use parser_mod::xch_parser;
+use balancer::handler::xch_balancer;
+use parser::handler::parser;
 
 // type aliases
 type Error<T> = (ErrorCases, Vec<Vec<T>>);
@@ -37,12 +37,12 @@ type Error<T> = (ErrorCases, Vec<Vec<T>>);
 ///
 /// The equation you provided should be a common unbalanced chemical equation which only contains **one** `=`.
 ///
-/// -  Stack Overflow may cause **panic**. Because it is using regex-based parser.
+/// -  Because the limitations of the `AddAssign` and other traits. Now we **cannot** do checked calculations every where. So, a **Overflow panic** may occur.
 /// -  A large number (bigger than [`usize::MAX`](https://doc.rust-lang.org/nightly/std/usize/constant.MAX.html)) of formula may cause **panic**. Because it is using `Vec`.
 ///
 /// And in the other failed situation, it'll return  `ErrorCases` and  parser's result (maybe it is empty).
 pub fn handler_api<T: CheckedType>(equation: &str) -> Result<Vec<Vec<T>>, Error<T>> {
-    let (ce_desc, list) = match xch_parser(equation) {
+    let (ce_desc, list) = match parser(equation) {
         Ok(s) => s,
         Err(e) => return Err((e, Vec::new())),
     };
@@ -55,24 +55,12 @@ pub fn handler_api<T: CheckedType>(equation: &str) -> Result<Vec<Vec<T>>, Error<
 /// All the Error Types.
 #[derive(PartialEq, Debug)]
 pub enum ErrorCases {
-    /// More or less than 1 `=` or not allowed chars.
-    IllegalEquation,
     /// Overflow.
     Overflow,
-    /// Brackets are not matched.
-    MatchError,
-    /// No formulas to split.
-    SplitError,
-    /// No tokens to get.
-    NoTokens,
-    /// Not found in `elements_table`.
-    NotFound,
-    /// Can't parse into `T`.
-    ParseError,
+    /// Parser's error with a message.
+    ParserError(String),
     /// `checked_neg()` error.
     NegError,
-    /// Internal Error - Illegal Usage was happened.
-    IllegalUsage,
     /// Only the [zero solution](http://www.mathwords.com/t/trivial.htm) can be found.
     ZeroSolution,
 }

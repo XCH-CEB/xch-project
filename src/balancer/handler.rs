@@ -19,10 +19,10 @@ use na::base::{Dynamic, MatrixMN};
 use num::rational::Ratio;
 use std::vec::Vec;
 // inside uses
+use super::maths::gauss_eliminate::GaussianElimination;
 use api::handler::ErrorCases;
 use api::traits::CheckedType;
-use math_methods::gauss_eliminate::GaussianElimination;
-use structs::ChemicalEquation;
+use public::ChemicalEquation;
 
 pub fn xch_balancer<T: CheckedType>(
     list: &[Vec<T>],
