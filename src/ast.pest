@@ -18,7 +18,7 @@ electron = { "<" ~ (num?) ~ "e" ~ sign ~ ">" }
 parenthesis_wrapper = { "(" ~ (molecule_group) ~ ")" ~ (num?) }
 
 // molecule and its group
-molecule = { (num?) ~ ((atom | parenthesis_wrapper)+) ~ (electron?)}
+molecule = { (num?) ~ ((atom | parenthesis_wrapper)+) ~ (electron?) }
 molecule_group = { molecule ~ (("." ~ molecule)*) }
 
 // main

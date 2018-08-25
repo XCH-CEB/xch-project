@@ -1,11 +1,14 @@
 [package]
 name = "lib_xch"
-version = "0.9.0"
+version = "0.9.1"
 authors = ["LEXUGE <LEXUGEyky@outlook.com>"]
 description = "Crate xch-ceb's official lib"
 license = "GPL-3.0"
 repository = "https://github.com/XCH-CEB/lib-xch-ceb"
 readme = "README.md"
+
+[badges]
+travis-ci = { repository = "XCH-CEB/lib-xch-ceb" }
 
 [dependencies]
 num = "^0.2"

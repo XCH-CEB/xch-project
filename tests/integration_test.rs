@@ -83,6 +83,38 @@ fn solve() {
         "Pb(N3)2+Cr(MnO4)2=Cr2O3+MnO2+Pb3O4+NO",
         &[&[15, 44, 22, 88, 5, 90]],
     );
+    tester::<i32>(
+        "NH4<e+>+I<e->+ClO<e->=NHI2+NH3+Cl<e->+H2O",
+        &[&[2, 2, 2, 1, 1, 2, 2]],
+    );
+    tester::<i32>(
+        "HXeO4<e->+OH<e->=XeO6<4e->+Xe+O2+H2O",
+        &[&[2, -2, 0, 2, 3, 0], &[4, 8, 3, 1, 0, 6]],
+    );
+    tester::<i32>(
+        "CuS+CN<e->+OH<e->=Cu(CN)4<3e->+NCO<e->+S+S<2e->+H2O",
+        &[&[2, 8, 0, 2, 0, 1, 1, 0], &[-2, -7, 2, -2, 1, -2, 0, 1]],
+    );
+    tester::<i32>(
+        "NH4ClO4+HNO3+HCl=HClO4+N2O+Cl2+H2O",
+        &[
+            &[-1, 3, 2, 1, 1, 0, 0],
+            &[-4, 4, 11, -1, 0, 4, 0],
+            &[1, -1, -1, 0, 0, 0, 1],
+        ],
+    );
+    tester::<i32>(
+        "(NH4)2CO3+H2O=NH4OH+NH3+CO2+H2O",
+        &[
+            &[0, -1, -1, 1, 0, 0],
+            &[1, 1, 2, 0, 1, 0],
+            &[0, 1, 0, 0, 0, 1],
+        ],
+    );
+    tester::<i32>(
+        "Co(NO3)2+KNO2+CH3COOH=CH3COOK+K3(Co(NO2)6)+KNO3+NO+H2O",
+        &[&[-1, -4, 0, 0, -1, -1, 1, 0], &[2, 11, 2, 2, 2, 3, 0, 1]],
+    );
 }
 
 #[test]
@@ -96,4 +128,5 @@ fn error() {
         "/A=A*",
         &ParserError(" --> 1:1\n  |\n1 | /A=A*\n  | ^---\n  |\n  = expected molecule".to_string()),
     );
+    tester_error::<i32>("A=B", &ZeroSolution);
 }

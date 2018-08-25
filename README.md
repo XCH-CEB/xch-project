@@ -1,5 +1,5 @@
 # lib_xch
-[![Build Status](https://travis-ci.org/LEXUGE/lib-xch-ceb.svg?branch=master)](https://travis-ci.org/LEXUGE/lib-xch-ceb)  
+[![Build Status](https://travis-ci.org/XCH-CEB/lib-xch-ceb.svg?branch=master)](https://travis-ci.org/XCH-CEB/lib-xch-ceb)  
 
 This is crate [xch-ceb](https://crates.io/crates/xch-ceb)'s official lib.  
 [lib_xch on crates.io](https://crates.io/crates/lib_xch)  
@@ -43,6 +43,7 @@ fn input() -> String {
     equation.pop();
     equation
 }
+
 ```
 
 # License
@@ -53,3 +54,4 @@ Licensed under GPL-3.0
 - [x] Uses Gaussian-Jordan Elimination
 - [x] Provides the set of Basic Solutions
 - [x] Uses AST-based parser
+- [ ] Supports WebAssembly
