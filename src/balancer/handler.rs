@@ -21,8 +21,8 @@ use std::vec::Vec;
 // inside uses
 use super::maths::gauss_eliminate::GaussianElimination;
 use api::handler::ErrorCases;
+use api::structs::ChemicalEquation;
 use api::traits::CheckedType;
-use public::ChemicalEquation;
 
 pub fn xch_balancer<T: CheckedType>(
     list: &[Vec<T>],

@@ -18,7 +18,7 @@ lib_xch = "^0.7"
 **You can use the latest version number (e.g. v0.8) to replace v0.7**
 
 # Example
-The source code of [xch-ceb](https://crates.io/crates/xch-ceb/)
+For more information, please read the source code of [xch-ceb](https://crates.io/crates/xch-ceb/)
 ```rust
 extern crate lib_xch;
 

@@ -20,8 +20,8 @@ use pest::Parser;
 use super::ast::treebuilder::ASTTreeBuilder;
 use super::datastructure::TableDesc;
 use api::handler::ErrorCases;
+use api::structs::ChemicalEquation;
 use api::traits::CheckedType;
-use public::ChemicalEquation;
 use public::{safe_calc, Operator};
 
 #[derive(Parser)]

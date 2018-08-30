@@ -13,24 +13,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-use lib_xch::api::handler::{handler_api, ErrorCases};
-use lib_xch::api::traits::CheckedType;
+//! Public structs
 
-pub fn tester<T: CheckedType>(equ: &str, v: &[&[T]]) {
-    let tmp = match handler_api::<T>(equ) {
-        Ok((_, v)) => v,
-        Err((e, _)) => {
-            println!("{:?}", e);
-            panic!(e)
-        }
-    };
-    assert_eq!(tmp, v);
-}
-
-pub fn tester_error<T: CheckedType>(payload: &str, err: &ErrorCases) {
-    let tmp = match handler_api::<T>(payload) {
-        Ok(_) => panic!("Failed!"),
-        Err((e, _)) => e,
-    };
-    assert_eq!(tmp, *err);
+/// Description of the chemical equation
+pub struct ChemicalEquation {
+    /// The number of the chemical formulas of the left side.
+    pub left: usize,
+    /// The number of the chemical formulas of the right side.
+    pub right: usize,
+    /// The sum of all the chemical formulas in the equation.
+    pub sum: usize,
 }

@@ -31,9 +31,3 @@ pub fn safe_calc<T: CheckedCalc>(a: &T, b: &T, op: &Operator) -> Result<T, Error
         Operator::Neg => CheckedNeg::checked_neg(a).ok_or(NegError),
     }
 }
-
-pub struct ChemicalEquation {
-    pub left: usize,
-    pub right: usize,
-    pub sum: usize,
-}

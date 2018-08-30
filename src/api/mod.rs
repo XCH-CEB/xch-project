@@ -16,4 +16,5 @@
 //! The APIs
 
 pub mod handler;
+pub mod structs;
 pub mod traits;

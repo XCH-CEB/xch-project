@@ -16,12 +16,14 @@
 //! The major part of APIs.
 
 // inside uses
-use api::traits::CheckedType;
+use super::structs::ChemicalEquation;
+use super::traits::CheckedType;
 use balancer::handler::xch_balancer;
 use parser::handler::parser;
 
 // type aliases
 type Error<T> = (ErrorCases, Vec<Vec<T>>);
+type Normal<T> = (ChemicalEquation, Vec<Vec<T>>);
 
 /// The API which balances the Chemical Equation by equation.
 ///
@@ -29,7 +31,7 @@ type Error<T> = (ErrorCases, Vec<Vec<T>>);
 ///
 /// You can use any type which implemented the trait `api::traits::CheckedType`
 ///
-/// If the equation can balance, function would return a `Vec<Vec<T>>` which contains the answer.
+/// If the equation can balance, function would return `Ok((ChemicalEquation, Vec<Vec<T>>))` which contains the answer.
 ///
 /// If not, it would return `Err((ErrorCases, Vec<Vec<T>>))` which contains the error message and Delta-3 the parser's result.
 ///
@@ -41,13 +43,13 @@ type Error<T> = (ErrorCases, Vec<Vec<T>>);
 /// -  A large number (bigger than [`usize::MAX`](https://doc.rust-lang.org/nightly/std/usize/constant.MAX.html)) of formula may cause **panic**. Because it is using `Vec`.
 ///
 /// And in the other failed situation, it'll return  `ErrorCases` and  parser's result (maybe it is empty).
-pub fn handler_api<T: CheckedType>(equation: &str) -> Result<Vec<Vec<T>>, Error<T>> {
+pub fn handler_api<T: CheckedType>(equation: &str) -> Result<Normal<T>, Error<T>> {
     let (ce_desc, list) = match parser(equation) {
         Ok(s) => s,
         Err(e) => return Err((e, Vec::new())),
     };
     match xch_balancer(&list, &ce_desc) {
-        Ok(s) => Ok(s),
+        Ok(s) => Ok((ce_desc, s)),
         Err(e) => Err((e, list)),
     }
 }
