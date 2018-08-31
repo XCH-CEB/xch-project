@@ -5,7 +5,6 @@
 This is XCH Project.  
 It's a chemical equation balancing toolkit written in Rust language.   
 [lib_xch](https://crates.io/crates/lib_xch)   
-
 [xch-ceb](https://crates.io/crates/xch-ceb)  
 
 

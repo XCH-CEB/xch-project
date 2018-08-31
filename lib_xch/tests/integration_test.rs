@@ -115,6 +115,22 @@ fn solve() {
         "Co(NO3)2+KNO2+CH3COOH=CH3COOK+K3(Co(NO2)6)+KNO3+NO+H2O",
         &[&[-1, -4, 0, 0, -1, -1, 1, 0], &[2, 11, 2, 2, 2, 3, 0, 1]],
     );
+    tester::<i32>(
+        "KMnO4+Fe<2e+>+H<e+>=Mn<2e+>+K<e+>+Fe<3e+>+H2O",
+        &[&[1, 5, 8, 1, 1, 5, 4]],
+    );
+    tester::<i32>(
+        "KMnO4+KNO2+H2SO4=MnSO4+K2SO4+KNO3+H2O",
+        &[&[2, 5, 3, 2, 1, 5, 3]],
+    );
+    tester::<i32>(
+        "CH2OH(CHOH)4CHO+Ag(NH3)2OH=Ag+NH3+CH2OH(CHOH)4COONH4+H2O",
+        &[&[1, 2, 2, 3, 1, 1]],
+    );
+    tester::<i32>(
+        "Pb(N3)2+Cr(MnO4)2=Cr2O3+MnO2+Pb3O4+NO",
+        &[&[15, 44, 22, 88, 5, 90]],
+    );
 }
 
 #[test]
