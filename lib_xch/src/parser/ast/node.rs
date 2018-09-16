@@ -15,8 +15,7 @@
 
 // Overall: This is the source code of the Delta-3 Parser.
 
-use id_tree::NodeIdError;
-use id_tree::{NodeId, Tree};
+use id_tree::{NodeId, NodeIdError, Tree};
 // inside uses
 use self::NodeType::{Atom, Molecule, MoleculeGroup, ParenthesisWrapper};
 use super::super::atomdict::AtomDict;

@@ -15,8 +15,10 @@
 
 // Overall: This is the source code of the Delta-3 Parser.
 
-use std::collections::HashMap;
-use std::ops::{Add, AddAssign, Mul, MulAssign};
+use std::{
+    collections::HashMap,
+    ops::{Add, AddAssign, Mul, MulAssign},
+};
 // inside uses
 use api::traits::CheckedType;
 
@@ -92,7 +94,8 @@ mod tests {
                 ("H".to_string(), 6),
                 ("O".to_string(), 1),
                 ("C".to_string(), 1)
-            ].iter()
+            ]
+                .iter()
                 .cloned()
                 .collect::<HashMap<String, i32>>()
         );

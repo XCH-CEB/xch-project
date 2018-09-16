@@ -16,13 +16,12 @@
 // Overall: This is the source code of the Hyper Mathlib.
 
 use na::base::{Dynamic, MatrixMN};
-use num::rational::Ratio;
-use num::Signed;
-use num::{One, Zero};
+use num::{rational::Ratio, One, Signed, Zero};
 // inside uses
-use api::handler::ErrorCases;
-use api::handler::ErrorCases::ZeroSolution;
-use api::traits::CheckedType;
+use api::{
+    handler::{ErrorCases, ErrorCases::ZeroSolution},
+    traits::CheckedType,
+};
 
 pub struct GaussianElimination<T: CheckedType> {
     matrix_a: MatrixMN<Ratio<T>, Dynamic, Dynamic>, // A n*m matrix.

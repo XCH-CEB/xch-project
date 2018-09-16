@@ -18,8 +18,7 @@
 use std::collections::HashMap;
 // inside uses
 use super::atomdict::AtomDict;
-use api::handler::ErrorCases;
-use api::traits::CheckedType;
+use api::{handler::ErrorCases, traits::CheckedType};
 use public::{safe_calc, Operator};
 
 // This is the data structure of describing the result of Delta-3 Parser.

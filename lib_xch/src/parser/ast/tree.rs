@@ -15,15 +15,13 @@
 
 // Overall: This is the source code of the Delta-3 Parser.
 
-use id_tree::InsertBehavior::*;
-use id_tree::NodeIdError;
-use id_tree::{Node, NodeId, Tree, TreeBuilder};
+use id_tree::{
+    InsertBehavior::{AsRoot, UnderNode},
+    Node, NodeId, NodeIdError, Tree, TreeBuilder,
+};
 // inside uses
-use super::super::atomdict::AtomDict;
-use super::node::ASTNode;
-use super::node::NodeType;
-use api::handler::ErrorCases;
-use api::traits::CheckedType;
+use super::{super::atomdict::AtomDict, node::ASTNode, node::NodeType};
+use api::{handler::ErrorCases, traits::CheckedType};
 
 pub struct ASTTree<T: CheckedType> {
     tree: Tree<ASTNode<T>>,

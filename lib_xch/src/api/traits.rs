@@ -16,14 +16,15 @@
 //! The traits which may be useful.
 
 use na::base::Scalar;
-use num::traits::ops::checked::{CheckedAdd, CheckedNeg};
-use num::traits::Num;
-use num::traits::NumAssign;
-use num::{Integer, Signed};
+use num::{
+    traits::{
+        ops::checked::{CheckedAdd, CheckedNeg},
+        Num, NumAssign,
+    },
+    Integer, Signed,
+};
 // inside uses
-use std::fmt::Display;
-use std::marker::Copy;
-use std::str::FromStr;
+use std::{fmt::Display, marker::Copy, str::FromStr};
 
 // marcos for auto-creating implementations
 macro_rules! checked_calc_impl {

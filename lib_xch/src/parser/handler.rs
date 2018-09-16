@@ -17,11 +17,8 @@
 
 use pest::Parser;
 // inside uses
-use super::ast::treebuilder::ASTTreeBuilder;
-use super::datastructure::TableDesc;
-use api::handler::ErrorCases;
-use api::structs::ChemicalEquation;
-use api::traits::CheckedType;
+use super::{ast::treebuilder::ASTTreeBuilder, datastructure::TableDesc};
+use api::{handler::ErrorCases, structs::ChemicalEquation, traits::CheckedType};
 use public::{safe_calc, Operator};
 
 #[derive(Parser)]

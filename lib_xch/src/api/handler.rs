@@ -16,8 +16,7 @@
 //! The major part of APIs.
 
 // inside uses
-use super::structs::ChemicalEquation;
-use super::traits::CheckedType;
+use super::{structs::ChemicalEquation, traits::CheckedType};
 use balancer::handler::xch_balancer;
 use parser::handler::parser;
 

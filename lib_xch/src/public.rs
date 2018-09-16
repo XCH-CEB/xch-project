@@ -15,9 +15,13 @@
 
 use num::traits::ops::checked::{CheckedAdd, CheckedNeg};
 // inside uses
-use api::handler::ErrorCases;
-use api::handler::ErrorCases::{NegError, Overflow};
-use api::traits::CheckedCalc;
+use api::{
+    handler::{
+        ErrorCases,
+        ErrorCases::{NegError, Overflow},
+    },
+    traits::CheckedCalc,
+};
 
 // Operator
 pub enum Operator {

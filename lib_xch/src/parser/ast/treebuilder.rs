@@ -16,14 +16,11 @@
 // Overall: This is the source code of the Delta-3 Parser.
 
 use id_tree::NodeId;
-use pest::iterators::Pair;
-use pest::Parser;
+use pest::{iterators::Pair, Parser};
 use std::str::FromStr;
 // inside uses
-use super::node::NodeType;
-use super::tree::ASTTree;
-use api::handler::ErrorCases;
-use api::traits::CheckedType;
+use super::{node::NodeType, tree::ASTTree};
+use api::{handler::ErrorCases, traits::CheckedType};
 
 #[derive(Parser)]
 #[grammar = "ast.pest"]
@@ -167,7 +164,8 @@ mod tests {
                 ("O".to_string(), 42),
                 ("P".to_string(), 1),
                 ("Mo".to_string(), 12)
-            ].iter()
+            ]
+                .iter()
                 .cloned()
                 .collect::<HashMap<String, i32>>()
         );
