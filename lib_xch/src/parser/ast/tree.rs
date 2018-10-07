@@ -25,17 +25,16 @@ use api::{handler::ErrorCases, traits::CheckedType};
 
 pub struct ASTTree<T: CheckedType> {
     tree: Tree<ASTNode<T>>,
-    root_id: NodeId,
 }
 
 impl<T: CheckedType> ASTTree<T> {
-    pub fn new() -> Result<Self, ErrorCases> {
+    pub fn new() -> Result<(Self, NodeId), ErrorCases> {
         let mut tree: Tree<ASTNode<T>> = TreeBuilder::new().build();
         let root_id = match tree.insert(Node::new(ASTNode::new(NodeType::MoleculeGroup)), AsRoot) {
             Ok(s) => s,
             Err(_) => return Err(ErrorCases::ParserError("[AST] NodeId Error".to_string())),
         };
-        Ok(Self { tree, root_id })
+        Ok((Self { tree }, root_id))
     }
 
     pub fn new_node(
@@ -47,14 +46,10 @@ impl<T: CheckedType> ASTTree<T> {
             .insert(Node::new(ASTNode::new(nodetype)), UnderNode(parent))
     }
 
-    pub fn get_root_id(&self) -> NodeId {
-        (*self.tree.root_node_id().unwrap()).clone() // Root Node must be exist
-    }
-
     pub fn to_atomdict(&self) -> Result<AtomDict<T>, NodeIdError> {
         self.tree
-            .get(&self.root_id)?
+            .get(&self.tree.root_node_id().unwrap())?
             .data()
-            .to_atomdict(&self.root_id, &self.tree)
+            .to_atomdict(&self.tree.root_node_id().unwrap(), &self.tree)
     }
 }

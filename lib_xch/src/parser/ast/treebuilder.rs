@@ -34,15 +34,14 @@ impl ASTTreeBuilder {
     }
 
     pub fn parse<T: CheckedType>(&self, formula: &str) -> Result<ASTTree<T>, ErrorCases> {
-        let mut tree = ASTTree::<T>::new()?;
+        let (mut tree, root_id) = ASTTree::<T>::new()?;
         let pairs = match MoleculeParser::parse(Rule::molecule_group, formula) {
             Ok(s) => s,
             Err(e) => return Err(ErrorCases::ParserError(e.to_string())),
         };
-        let root_id = &tree.get_root_id();
         for p in pairs {
             // The `pairs` only contains one Pair actually.
-            self.build_tree(p, &mut tree, root_id)?
+            self.build_tree(p, &mut tree, &root_id)?
         }
         Ok(tree)
     }
