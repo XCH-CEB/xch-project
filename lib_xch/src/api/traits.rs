@@ -56,16 +56,19 @@ checked_calc_impl!(u8);
 checked_calc_impl!(u16);
 checked_calc_impl!(u32);
 checked_calc_impl!(u64);
+checked_calc_impl!(u128);
 checked_calc_impl!(usize);
 
 checked_calc_impl!(i8);
 checked_calc_impl!(i16);
 checked_calc_impl!(i32);
 checked_calc_impl!(i64);
+checked_calc_impl!(i128);
 checked_calc_impl!(isize);
 
 checked_type_impl!(i8);
 checked_type_impl!(i16);
 checked_type_impl!(i32);
 checked_type_impl!(i64);
+checked_type_impl!(i128);
 checked_type_impl!(isize);
