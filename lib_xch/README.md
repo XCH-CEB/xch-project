@@ -54,4 +54,3 @@ Licensed under GPL-3.0
 - [x] Uses Gaussian-Jordan Elimination
 - [x] Provides the set of Basic Solutions
 - [x] Uses AST-based parser
-- [ ] Supports WebAssembly
