@@ -13,25 +13,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-use num::traits::ops::checked::{CheckedAdd, CheckedNeg};
-// inside uses
-use api::{
-    handler::{
-        ErrorCases,
-        ErrorCases::{NegError, Overflow},
-    },
-    traits::CheckedCalc,
-};
+use num::Num;
+use std::num::ParseIntError;
+// inside use(s)
+use super::Cell;
+use api::traits::{CheckedCalc, CheckedType};
 
-// Operator
-pub enum Operator {
-    Add,
-    Neg,
-}
-
-pub fn safe_calc<T: CheckedCalc>(a: &T, b: &T, op: &Operator) -> Result<T, ErrorCases> {
-    match *op {
-        Operator::Add => CheckedAdd::checked_add(a, b).ok_or(Overflow),
-        Operator::Neg => CheckedNeg::checked_neg(a).ok_or(NegError),
+impl<U: CheckedType + CheckedCalc> Num for Cell<U>
+where
+    std::num::ParseIntError: std::convert::From<<U as num::Num>::FromStrRadixErr>,
+{
+    type FromStrRadixErr = ParseIntError;
+    fn from_str_radix(str: &str, radix: u32) -> Result<Self, Self::FromStrRadixErr> {
+        let data = U::from_str_radix(str, radix)?;
+        Ok(Cell {
+            error_tag: false,
+            data,
+        })
     }
 }

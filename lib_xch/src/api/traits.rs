@@ -18,7 +18,7 @@
 use na::base::Scalar;
 use num::{
     traits::{
-        ops::checked::{CheckedAdd, CheckedNeg},
+        ops::checked::{CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg, CheckedRem, CheckedSub},
         Num, NumAssign,
     },
     Integer, Signed,
@@ -40,13 +40,15 @@ macro_rules! checked_type_impl {
 }
 
 /// The trait which must be implemented when using `safe_calc()`
-pub trait CheckedCalc: CheckedAdd + CheckedNeg {
+pub trait CheckedCalc:
+    CheckedAdd + CheckedSub + CheckedMul + CheckedDiv + CheckedRem + CheckedNeg
+{
     // Empty
 }
 
 /// The trait which must be implemented.
 pub trait CheckedType:
-    Num + Copy + FromStr + CheckedCalc + Integer + Scalar + Signed + NumAssign + Display
+    Num + Copy + FromStr + Integer + Scalar + Signed + NumAssign + Display + Clone
 {
     // Empty
 }

@@ -14,9 +14,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 use lib_xch::api::handler::{handler_api, ErrorCases};
-use lib_xch::api::traits::CheckedType;
+use lib_xch::api::traits::{CheckedCalc, CheckedType};
 
-pub fn tester<T: CheckedType>(equ: &str, v: &[&[T]]) {
+pub fn tester<T: CheckedType + CheckedCalc>(equ: &str, v: &[&[T]])
+where
+    std::num::ParseIntError: std::convert::From<<T as num::Num>::FromStrRadixErr>
+        + std::convert::From<<T as std::str::FromStr>::Err>,
+{
     let tmp = match handler_api::<T>(equ) {
         Ok((_, v)) => v,
         Err((e, _)) => {
@@ -27,7 +31,11 @@ pub fn tester<T: CheckedType>(equ: &str, v: &[&[T]]) {
     assert_eq!(tmp, v);
 }
 
-pub fn tester_error<T: CheckedType>(payload: &str, err: &ErrorCases) {
+pub fn tester_error<T: CheckedType + CheckedCalc>(payload: &str, err: &ErrorCases)
+where
+    std::num::ParseIntError: std::convert::From<<T as num::Num>::FromStrRadixErr>
+        + std::convert::From<<T as std::str::FromStr>::Err>,
+{
     let tmp = match handler_api::<T>(payload) {
         Ok(_) => panic!("Failed!"),
         Err((e, _)) => e,

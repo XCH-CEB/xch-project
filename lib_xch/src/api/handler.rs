@@ -16,9 +16,13 @@
 //! The major part of APIs.
 
 // inside uses
-use super::{structs::ChemicalEquation, traits::CheckedType};
+use super::{
+    structs::ChemicalEquation,
+    traits::{CheckedCalc, CheckedType},
+};
 use balancer::handler::xch_balancer;
 use parser::handler::parser;
+use public::cell::Cell;
 
 // type aliases
 type Error<T> = (ErrorCases, Vec<Vec<T>>);
@@ -36,21 +40,41 @@ type Normal<T> = (ChemicalEquation, Vec<Vec<T>>);
 ///
 /// # Panics
 ///
-/// The equation you provided should be a common unbalanced chemical equation which only contains **one** `=`.
-///
-/// -  Because the limitations of the `AddAssign` and other traits. Now we **cannot** do checked calculations every where. So, a **Overflow panic** may occur.
 /// -  A large number (bigger than [`usize::MAX`](https://doc.rust-lang.org/nightly/std/usize/constant.MAX.html)) of formula may cause **panic**. Because it is using `Vec`.
 ///
 /// And in the other failed situation, it'll return  `ErrorCases` and  parser's result (maybe it is empty).
-pub fn handler_api<T: CheckedType>(equation: &str) -> Result<Normal<T>, Error<T>> {
-    let (ce_desc, list) = match parser(equation) {
+pub fn handler_api<T: CheckedType + CheckedCalc>(equation: &str) -> Result<Normal<T>, Error<T>>
+where
+    std::num::ParseIntError: std::convert::From<<T as num::Num>::FromStrRadixErr>
+        + std::convert::From<<T as std::str::FromStr>::Err>,
+{
+    let (ce_desc, list) = match parser::<Cell<T>>(equation) {
         Ok(s) => s,
         Err(e) => return Err((e, Vec::new())),
     };
     match xch_balancer(&list, &ce_desc) {
-        Ok(s) => Ok((ce_desc, s)),
-        Err(e) => Err((e, list)),
+        Ok(s) => if check_tag(&s) {
+            Ok((ce_desc, fromcell(&s)))
+        } else {
+            Err((ErrorCases::Overflow, fromcell(&list)))
+        },
+        Err(e) => if check_tag(&list) {
+            Err((e, fromcell(&list)))
+        } else {
+            Err((ErrorCases::Overflow, fromcell(&list)))
+        },
     }
+}
+
+// All `false` => `true`
+fn check_tag<T>(s: &[Vec<Cell<T>>]) -> bool {
+    s.iter().all(|x| x.iter().all(|x| !x.get_tag()))
+}
+
+fn fromcell<T: Clone>(s: &[Vec<Cell<T>>]) -> Vec<Vec<T>> {
+    s.into_iter()
+        .map(|x| x.into_iter().map(|s| s.get_data()).collect::<Vec<_>>())
+        .collect::<Vec<_>>()
 }
 
 /// All the Error Types.

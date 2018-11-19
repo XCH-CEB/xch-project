@@ -19,7 +19,6 @@ use std::collections::HashMap;
 // inside uses
 use super::atomdict::AtomDict;
 use api::{handler::ErrorCases, traits::CheckedType};
-use public::{safe_calc, Operator};
 
 // This is the data structure of describing the result of Delta-3 Parser.
 // This is the form of the `list`:
@@ -48,16 +47,8 @@ impl<T: CheckedType> TableDesc<T> {
                 self.list.push(generate_vec(self.formula_sum));
             }
             // store data in table
-            let value = if neg {
-                safe_calc(v, &T::zero(), &Operator::Neg)?
-            } else {
-                *v
-            };
-            self.list[self.elements_table[k]][location] = safe_calc(
-                &self.list[self.elements_table[k]][location],
-                &value,
-                &Operator::Add,
-            )?;
+            let value = if neg { -(*v) } else { *v };
+            self.list[self.elements_table[k]][location] += value;
         }
         Ok(())
     }

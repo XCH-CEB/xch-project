@@ -102,7 +102,7 @@ dependencies = [
 
 [[package]]
 name = "lib_xch"
-version = "0.10.4"
+version = "0.11.0"
 dependencies = [
  "id_tree 1.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "nalgebra 0.16.10 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -358,9 +358,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "xch-ceb"
-version = "0.4.2"
+version = "0.4.3"
 dependencies = [
- "lib_xch 0.10.4",
+ "lib_xch 0.11.0",
 ]
 
 [metadata]

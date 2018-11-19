@@ -19,7 +19,7 @@ use pest::Parser;
 // inside uses
 use super::{ast::treebuilder::ASTTreeBuilder, datastructure::TableDesc};
 use api::{handler::ErrorCases, structs::ChemicalEquation, traits::CheckedType};
-use public::{safe_calc, Operator};
+use public::calc::{safe_calc, Operator};
 
 #[derive(Parser)]
 #[grammar = "ast.pest"]

@@ -1,6 +1,6 @@
 [package]
 name = "xch-ceb"
-version = "0.4.2"
+version = "0.4.3"
 authors = ["LEXUGE <LEXUGEyky@outlook.com>"]
 license = "GPL-3.0"
 description = "XCH - Chemical Equation Balancer"
@@ -10,4 +10,4 @@ repository = "https://github.com/XCH-CEB/xch-project"
 travis-ci = { repository = "XCH-CEB/xch-project" }
 
 [dependencies]
-lib_xch = { version="^0.10", path = "../lib_xch" }
+lib_xch = { version="^0.11", path = "../lib_xch" }

@@ -145,4 +145,6 @@ fn error() {
         &ParserError(" --> 1:1\n  |\n1 | /A=A*\n  | ^---\n  |\n  = expected molecule".to_string()),
     );
     tester_error::<i32>("A=B", &ZeroSolution);
+    tester_error::<i32>("((((A32767)32767)32767)32767)=A", &Overflow);
+    tester_error::<i32>("(A2147483647)2+A=A", &Overflow);
 }
