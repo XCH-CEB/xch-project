@@ -10,12 +10,11 @@ Swift, Small, Safe.
 
 # Getting Started
 First of all, you should pick a version.  
-At this time (2018), add following dependency to your `Cargo.toml`:  
+At this time (2018.11), add following dependency to your `Cargo.toml`:  
 ```
 [dependencies]
-lib_xch = "^0.7"
+lib_xch = "^0.11"
 ```  
-**You can use the latest version number (e.g. v0.8) to replace v0.7**
 
 # Example
 For more information, please read the source code of [xch-ceb](https://crates.io/crates/xch-ceb/)

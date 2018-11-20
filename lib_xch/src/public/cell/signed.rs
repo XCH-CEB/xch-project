@@ -16,27 +16,27 @@
 use num::Signed;
 // inside use(s)
 use super::Cell;
-use api::traits::{CheckedCalc, CheckedType};
+use api::traits::CheckedCalc;
 
-impl<U: CheckedType + CheckedCalc> Signed for Cell<U>
+impl<U: Signed + CheckedCalc> Signed for Cell<U>
 where
     std::num::ParseIntError: std::convert::From<<U as num::Num>::FromStrRadixErr>,
 {
     fn abs(&self) -> Self {
         Cell {
-            error_tag: false,
+            error_tag: self.error_tag,
             data: self.data.abs(),
         }
     }
     fn abs_sub(&self, other: &Self) -> Self {
         Cell {
-            error_tag: false,
+            error_tag: self.error_tag | other.error_tag,
             data: self.data.abs_sub(&other.data),
         }
     }
     fn signum(&self) -> Self {
         Cell {
-            error_tag: false,
+            error_tag: self.error_tag,
             data: self.data.signum(),
         }
     }

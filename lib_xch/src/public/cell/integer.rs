@@ -24,25 +24,25 @@ where
 {
     fn div_floor(&self, other: &Self) -> Self {
         Cell {
-            error_tag: false,
+            error_tag: self.error_tag | other.error_tag,
             data: self.data.div_floor(&other.data),
         }
     }
     fn mod_floor(&self, other: &Self) -> Self {
         Cell {
-            error_tag: false,
+            error_tag: self.error_tag | other.error_tag,
             data: self.data.mod_floor(&other.data),
         }
     }
     fn gcd(&self, other: &Self) -> Self {
         Cell {
-            error_tag: false,
+            error_tag: self.error_tag | other.error_tag,
             data: self.data.gcd(&other.data),
         }
     }
     fn lcm(&self, other: &Self) -> Self {
         Cell {
-            error_tag: false,
+            error_tag: self.error_tag | other.error_tag,
             data: self.data.lcm(&other.data),
         }
     }
@@ -62,11 +62,11 @@ where
         let (quotient, remainder) = self.data.div_rem(&other.data);
         (
             Cell {
-                error_tag: false,
+                error_tag: self.error_tag | other.error_tag,
                 data: quotient,
             },
             Cell {
-                error_tag: false,
+                error_tag: self.error_tag | other.error_tag,
                 data: remainder,
             },
         )

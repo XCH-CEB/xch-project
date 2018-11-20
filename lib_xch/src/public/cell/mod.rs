@@ -22,10 +22,11 @@ mod integer;
 mod num;
 mod signed;
 
+use std::cmp::Ordering;
 // inside use(s)
 use api::traits::{CheckedCalc, CheckedType};
 
-#[derive(Eq, PartialEq, Ord, PartialOrd, Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct Cell<U> {
     error_tag: bool,
     data: U,
@@ -54,6 +55,27 @@ impl<U: CheckedType + CheckedCalc> CheckedType for Cell<U> where
     std::num::ParseIntError: std::convert::From<<U as ::num::Num>::FromStrRadixErr>
         + std::convert::From<<U as std::str::FromStr>::Err>
 {}
+
+// impls of `Eq`, `PartialEq`, `Ord`, `PartialOrd`
+impl<U: PartialEq> PartialEq for Cell<U> {
+    fn eq(&self, other: &Self) -> bool {
+        self.data == other.data
+    }
+}
+
+impl<U: PartialEq> Eq for Cell<U> {}
+
+impl<U: PartialOrd + Ord> Ord for Cell<U> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.data.cmp(&other.data)
+    }
+}
+
+impl<U: PartialEq + Ord> PartialOrd for Cell<U> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(&other))
+    }
+}
 
 // unit tests
 #[cfg(test)]

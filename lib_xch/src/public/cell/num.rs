@@ -17,9 +17,9 @@ use num::Num;
 use std::num::ParseIntError;
 // inside use(s)
 use super::Cell;
-use api::traits::{CheckedCalc, CheckedType};
+use api::traits::CheckedCalc;
 
-impl<U: CheckedType + CheckedCalc> Num for Cell<U>
+impl<U: Num + CheckedCalc> Num for Cell<U>
 where
     std::num::ParseIntError: std::convert::From<<U as num::Num>::FromStrRadixErr>,
 {
