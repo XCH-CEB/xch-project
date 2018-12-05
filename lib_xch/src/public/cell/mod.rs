@@ -88,6 +88,7 @@ mod tests {
         let b = Cell::<i32>::new(1);
         let c = a + b;
         assert_eq!(c.error_tag, true);
+        assert_eq!(c, Cell::<i32>::new(1));
     }
 
     #[test]
@@ -96,6 +97,7 @@ mod tests {
         let b = Cell::<i32>::new(1);
         let c = a - b;
         assert_eq!(c.error_tag, true);
+        assert_eq!(c, Cell::<i32>::new(1));
     }
 
     #[test]
@@ -104,5 +106,15 @@ mod tests {
         let b = Cell::<i32>::new(2);
         let c = a * b;
         assert_eq!(c.error_tag, true);
+        assert_eq!(c, Cell::<i32>::new(1));
+    }
+
+    #[test]
+    fn overflow_test_4() {
+        let a = Cell::<i32>::new(std::i32::MIN);
+        let b = Cell::<i32>::new(-1);
+        let c = a / b;
+        assert_eq!(c.error_tag, true);
+        assert_eq!(c, Cell::<i32>::new(1));
     }
 }
