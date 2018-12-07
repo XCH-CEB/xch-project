@@ -15,7 +15,6 @@
 
 // extern crate(s)
 
-
 use lib_xch::api::handler::handler_api;
 use lib_xch::api::handler::ErrorCases;
 use lib_xch::api::structs::ChemicalEquation;

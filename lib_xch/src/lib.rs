@@ -34,10 +34,9 @@
 const _GRAMMAR: &str = include_str!("ast.pest");
 
 // extern crate(s)
-
 use nalgebra as na;
-
 use pest;
+#[macro_use]
 extern crate pest_derive;
 
 // mods
