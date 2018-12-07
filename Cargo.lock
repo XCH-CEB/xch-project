@@ -358,7 +358,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "xch-ceb"
-version = "0.4.3"
+version = "0.4.4"
 dependencies = [
  "lib_xch 0.11.2",
 ]

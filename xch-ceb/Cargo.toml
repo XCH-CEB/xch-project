@@ -1,10 +1,11 @@
 [package]
 name = "xch-ceb"
-version = "0.4.3"
+version = "0.4.4"
 authors = ["LEXUGE <LEXUGEyky@outlook.com>"]
 license = "GPL-3.0"
 description = "XCH - Chemical Equation Balancer"
 repository = "https://github.com/XCH-CEB/xch-project"
+edition = "2018"
 
 [badges]
 travis-ci = { repository = "XCH-CEB/xch-project" }
