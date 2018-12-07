@@ -20,9 +20,9 @@ use super::{
     structs::ChemicalEquation,
     traits::{CheckedCalc, CheckedType},
 };
-use balancer::handler::xch_balancer;
-use parser::handler::parser;
-use public::cell::Cell;
+use crate::balancer::handler::xch_balancer;
+use crate::parser::handler::parser;
+use crate::public::cell::Cell;
 
 // type aliases
 type Error<T> = (ErrorCases, Vec<Vec<T>>);
@@ -53,16 +53,20 @@ where
         Err(e) => return Err((e, Vec::new())),
     };
     match xch_balancer(&list, &ce_desc) {
-        Ok(s) => if check_tag(&s) {
-            Ok((ce_desc, fromcell(&s)))
-        } else {
-            Err((ErrorCases::Overflow, fromcell(&list)))
-        },
-        Err(e) => if check_tag(&list) {
-            Err((e, fromcell(&list)))
-        } else {
-            Err((ErrorCases::Overflow, fromcell(&list)))
-        },
+        Ok(s) => {
+            if check_tag(&s) {
+                Ok((ce_desc, fromcell(&s)))
+            } else {
+                Err((ErrorCases::Overflow, fromcell(&list)))
+            }
+        }
+        Err(e) => {
+            if check_tag(&list) {
+                Err((e, fromcell(&list)))
+            } else {
+                Err((ErrorCases::Overflow, fromcell(&list)))
+            }
+        }
     }
 }
 

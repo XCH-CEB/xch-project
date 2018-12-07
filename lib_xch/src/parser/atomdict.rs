@@ -20,7 +20,7 @@ use std::{
     ops::{Add, AddAssign, Mul, MulAssign},
 };
 // inside uses
-use api::traits::CheckedType;
+use crate::api::traits::CheckedType;
 
 #[derive(Debug)]
 pub struct AtomDict<T: CheckedType> {
@@ -95,9 +95,9 @@ mod tests {
                 ("O".to_string(), 1),
                 ("C".to_string(), 1)
             ]
-                .iter()
-                .cloned()
-                .collect::<HashMap<String, i32>>()
+            .iter()
+            .cloned()
+            .collect::<HashMap<String, i32>>()
         );
     }
 

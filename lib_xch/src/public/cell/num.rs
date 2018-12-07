@@ -17,7 +17,7 @@ use num::Num;
 use std::num::ParseIntError;
 // inside use(s)
 use super::Cell;
-use api::traits::CheckedCalc;
+use crate::api::traits::CheckedCalc;
 
 impl<U: Num + CheckedCalc> Num for Cell<U>
 where

@@ -20,8 +20,8 @@ use std::{
 };
 // inside use(s)
 use super::Cell;
-use api::traits::CheckedCalc;
-use public::calc::{safe_calc, Operator};
+use crate::api::traits::CheckedCalc;
+use crate::public::calc::{safe_calc, Operator};
 
 // `Zero` and `One` impls
 impl<U: One + Zero + CheckedCalc> Zero for Cell<U> {

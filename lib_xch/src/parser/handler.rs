@@ -18,8 +18,8 @@
 use pest::Parser;
 // inside uses
 use super::{ast::treebuilder::ASTTreeBuilder, datastructure::TableDesc};
-use api::{handler::ErrorCases, structs::ChemicalEquation, traits::CheckedType};
-use public::calc::{safe_calc, Operator};
+use crate::api::{handler::ErrorCases, structs::ChemicalEquation, traits::CheckedType};
+use crate::public::calc::{safe_calc, Operator};
 
 #[derive(Parser)]
 #[grammar = "ast.pest"]
@@ -30,7 +30,8 @@ pub fn parser<T: CheckedType>(equ: &str) -> Result<(ChemicalEquation, Vec<Vec<T>
     let exps = match EquParser::parse(Rule::equ, equ) {
         Ok(s) => s,
         Err(e) => return Err(ErrorCases::ParserError(e.to_string())),
-    }.collect::<Vec<_>>();
+    }
+    .collect::<Vec<_>>();
     let mut ce_desc = ChemicalEquation {
         left: exps[0].clone().into_inner().count(),
         right: exps[1].clone().into_inner().count(),

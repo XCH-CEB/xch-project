@@ -15,12 +15,12 @@
 
 // Overall: This is the source code of the AlphaForce Balancer.
 
-use na::base::{Dynamic, MatrixMN};
+use crate::na::base::{Dynamic, MatrixMN};
 use num::rational::Ratio;
 use std::vec::Vec;
 // inside uses
 use super::maths::gauss_eliminate::GaussianElimination;
-use api::{handler::ErrorCases, structs::ChemicalEquation, traits::CheckedType};
+use crate::api::{handler::ErrorCases, structs::ChemicalEquation, traits::CheckedType};
 
 pub fn xch_balancer<T: CheckedType>(
     list: &[Vec<T>],
@@ -41,6 +41,7 @@ pub fn xch_balancer<T: CheckedType>(
             v.into_iter()
                 .map(|ratio| lcm / *ratio.denom() * *ratio.numer())
                 .collect::<Vec<_>>()
-        }).collect::<Vec<_>>();
+        })
+        .collect::<Vec<_>>();
     Ok(result)
 }

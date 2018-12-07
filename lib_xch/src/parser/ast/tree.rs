@@ -21,7 +21,7 @@ use id_tree::{
 };
 // inside uses
 use super::{super::atomdict::AtomDict, node::ASTNode, node::NodeType};
-use api::{handler::ErrorCases, traits::CheckedType};
+use crate::api::{handler::ErrorCases, traits::CheckedType};
 
 pub struct ASTTree<T: CheckedType> {
     tree: Tree<ASTNode<T>>,

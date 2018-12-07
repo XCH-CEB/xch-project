@@ -20,7 +20,7 @@ use pest::{iterators::Pair, Parser};
 use std::str::FromStr;
 // inside uses
 use super::{node::NodeType, tree::ASTTree};
-use api::{handler::ErrorCases, traits::CheckedType};
+use crate::api::{handler::ErrorCases, traits::CheckedType};
 
 #[derive(Parser)]
 #[grammar = "ast.pest"]
@@ -164,9 +164,9 @@ mod tests {
                 ("P".to_string(), 1),
                 ("Mo".to_string(), 12)
             ]
-                .iter()
-                .cloned()
-                .collect::<HashMap<String, i32>>()
+            .iter()
+            .cloned()
+            .collect::<HashMap<String, i32>>()
         );
     }
 }

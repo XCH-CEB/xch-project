@@ -17,8 +17,8 @@ extern crate lib_xch;
 
 mod testers;
 
+use crate::testers::{tester, tester_error};
 use lib_xch::api::handler::ErrorCases::*;
-use testers::{tester, tester_error};
 
 #[test]
 fn solve() {

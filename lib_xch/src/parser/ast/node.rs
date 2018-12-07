@@ -19,7 +19,7 @@ use id_tree::{NodeId, NodeIdError, Tree};
 // inside uses
 use self::NodeType::{Atom, Molecule, MoleculeGroup, ParenthesisWrapper};
 use super::super::atomdict::AtomDict;
-use api::traits::CheckedType;
+use crate::api::traits::CheckedType;
 
 pub enum NodeType<T: CheckedType> {
     Atom(String, T),       // `Symbol` and `Suffix_Operand`

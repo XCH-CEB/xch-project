@@ -18,7 +18,7 @@
 use std::collections::HashMap;
 // inside uses
 use super::atomdict::AtomDict;
-use api::{handler::ErrorCases, traits::CheckedType};
+use crate::api::{handler::ErrorCases, traits::CheckedType};
 
 // This is the data structure of describing the result of Delta-3 Parser.
 // This is the form of the `list`:

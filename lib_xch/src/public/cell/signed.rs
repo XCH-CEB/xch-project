@@ -16,7 +16,7 @@
 use num::Signed;
 // inside use(s)
 use super::Cell;
-use api::traits::CheckedCalc;
+use crate::api::traits::CheckedCalc;
 
 impl<U: Signed + CheckedCalc> Signed for Cell<U>
 where

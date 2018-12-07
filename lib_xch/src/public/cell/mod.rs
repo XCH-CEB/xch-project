@@ -24,7 +24,7 @@ mod signed;
 
 use std::cmp::Ordering;
 // inside use(s)
-use api::traits::{CheckedCalc, CheckedType};
+use crate::api::traits::{CheckedCalc, CheckedType};
 
 #[derive(Copy, Clone, Debug)]
 pub struct Cell<U> {
@@ -54,7 +54,8 @@ impl<U: Clone> Cell<U> {
 impl<U: CheckedType + CheckedCalc> CheckedType for Cell<U> where
     std::num::ParseIntError: std::convert::From<<U as ::num::Num>::FromStrRadixErr>
         + std::convert::From<<U as std::str::FromStr>::Err>
-{}
+{
+}
 
 // impls of `Eq`, `PartialEq`, `Ord`, `PartialOrd`
 impl<U: PartialEq> PartialEq for Cell<U> {

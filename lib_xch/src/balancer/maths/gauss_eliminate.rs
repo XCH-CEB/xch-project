@@ -15,10 +15,10 @@
 
 // Overall: This is the source code of the Hyper Mathlib.
 
-use na::base::{Dynamic, MatrixMN};
+use crate::na::base::{Dynamic, MatrixMN};
 use num::{rational::Ratio, One, Signed, Zero};
 // inside uses
-use api::{
+use crate::api::{
     handler::{ErrorCases, ErrorCases::ZeroSolution},
     traits::CheckedType,
 };

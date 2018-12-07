@@ -16,7 +16,7 @@
 use num::Integer;
 // inside use(s)
 use super::Cell;
-use api::traits::{CheckedCalc, CheckedType};
+use crate::api::traits::{CheckedCalc, CheckedType};
 
 impl<U: CheckedType + CheckedCalc> Integer for Cell<U>
 where
