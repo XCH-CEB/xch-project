@@ -48,7 +48,7 @@ impl ASTTreeBuilder {
 
     fn build_tree<T: CheckedType>(
         &self,
-        pair: Pair<Rule>,
+        pair: Pair<'_, Rule>,
         tree: &mut ASTTree<T>,
         parent: &NodeId,
     ) -> Result<(), ErrorCases> {

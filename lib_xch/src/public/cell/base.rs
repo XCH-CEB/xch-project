@@ -166,7 +166,7 @@ impl<U: One + CheckedCalc> Neg for Cell<U> {
 
 // Display
 impl<U: Display> Display for Cell<U> {
-    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
         std::fmt::Display::fmt(&self.data, f)?;
         Ok(())
     }

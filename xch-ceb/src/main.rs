@@ -14,7 +14,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // extern crate(s)
-extern crate lib_xch;
+
 
 use lib_xch::api::handler::handler_api;
 use lib_xch::api::handler::ErrorCases;
