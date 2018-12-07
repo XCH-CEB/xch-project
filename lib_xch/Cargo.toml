@@ -6,7 +6,6 @@ description = "Crate xch-ceb's official lib"
 license = "GPL-3.0"
 repository = "https://github.com/XCH-CEB/xch-project"
 readme = "README.md"
-edition = "2018"
 
 [badges]
 travis-ci = { repository = "XCH-CEB/xch-project" }
