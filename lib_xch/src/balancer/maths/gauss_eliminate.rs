@@ -15,7 +15,7 @@
 
 // Overall: This is the source code of the Hyper Mathlib.
 
-use crate::na::base::{Dynamic, MatrixMN};
+use nalgebra::base::{Dynamic, MatrixMN};
 use num::{rational::Ratio, One, Signed, Zero};
 // inside uses
 use crate::api::{

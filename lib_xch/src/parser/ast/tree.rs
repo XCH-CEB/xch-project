@@ -21,29 +21,43 @@ use id_tree::{
 };
 // inside uses
 use super::{super::atomdict::AtomDict, node::ASTNode, node::NodeType};
-use crate::api::{handler::ErrorCases, traits::CheckedType};
+use crate::api::traits::CheckedType;
 
 pub struct ASTTree<T: CheckedType> {
     tree: Tree<ASTNode<T>>,
+    nodes: Vec<NodeId>,
+    index: usize,
 }
 
 impl<T: CheckedType> ASTTree<T> {
-    pub fn new() -> Result<(Self, NodeId), ErrorCases> {
+    pub fn new() -> Self {
         let mut tree: Tree<ASTNode<T>> = TreeBuilder::new().build();
-        let root_id = match tree.insert(Node::new(ASTNode::new(NodeType::MoleculeGroup)), AsRoot) {
-            Ok(s) => s,
-            Err(_) => return Err(ErrorCases::ParserError("[AST] NodeId Error".to_string())),
-        };
-        Ok((Self { tree }, root_id))
+        let mut nodes: Vec<NodeId> = Vec::new();
+        nodes.push(
+            tree.insert(Node::new(ASTNode::new(NodeType::MoleculeGroup)), AsRoot)
+                .unwrap(), // By using `AsRoot`, it always return `Ok(_)`, so it's safe.
+        );
+        Self {
+            tree,
+            nodes,
+            index: 0,
+        }
     }
 
-    pub fn new_node(
-        &mut self,
-        nodetype: NodeType<T>,
-        parent: &NodeId,
-    ) -> Result<NodeId, NodeIdError> {
-        self.tree
-            .insert(Node::new(ASTNode::new(nodetype)), UnderNode(parent))
+    pub fn get_index(&self) -> usize {
+        self.index
+    }
+
+    pub fn change_index(&mut self, index: usize) {
+        self.index = index;
+    }
+
+    pub fn new_node(&mut self, nodetype: NodeType<T>) -> Result<usize, NodeIdError> {
+        self.nodes.push(self.tree.insert(
+            Node::new(ASTNode::new(nodetype)),
+            UnderNode(&self.nodes[self.index]),
+        )?);
+        Ok(self.nodes.len() - 1)
     }
 
     pub fn to_atomdict(&self) -> Result<AtomDict<T>, NodeIdError> {

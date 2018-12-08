@@ -5,7 +5,11 @@ rust:
 
 cache: cargo
 
+before_script:
+  - rustup component add clippy
+
 script:
   - cargo update
   - cargo build --verbose
   - cargo test --verbose
+  - cargo clippy --verbose

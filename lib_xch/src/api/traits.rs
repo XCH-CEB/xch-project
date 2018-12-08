@@ -15,7 +15,7 @@
 
 //! The traits which may be useful.
 
-use crate::na::base::Scalar;
+use nalgebra::base::Scalar;
 use num::{
     traits::{
         ops::checked::{CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg, CheckedRem, CheckedSub},

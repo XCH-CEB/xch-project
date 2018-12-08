@@ -15,7 +15,6 @@
 
 // Overall: This is the source code of the Delta-3 Parser.
 
-use id_tree::NodeId;
 use pest::{iterators::Pair, Parser};
 use std::str::FromStr;
 // inside uses
@@ -34,14 +33,14 @@ impl ASTTreeBuilder {
     }
 
     pub fn parse<T: CheckedType>(&self, formula: &str) -> Result<ASTTree<T>, ErrorCases> {
-        let (mut tree, root_id) = ASTTree::<T>::new()?;
+        let mut tree = ASTTree::<T>::new();
         let pairs = match MoleculeParser::parse(Rule::molecule_group, formula) {
             Ok(s) => s,
             Err(e) => return Err(ErrorCases::ParserError(e.to_string())),
         };
         for p in pairs {
             // The `pairs` only contains one Pair actually.
-            self.build_tree(p, &mut tree, &root_id)?
+            self.build_tree(p, &mut tree)?
         }
         Ok(tree)
     }
@@ -50,7 +49,6 @@ impl ASTTreeBuilder {
         &self,
         pair: Pair<'_, Rule>,
         tree: &mut ASTTree<T>,
-        parent: &NodeId,
     ) -> Result<(), ErrorCases> {
         match pair.as_rule() {
             Rule::atom => {
@@ -61,7 +59,7 @@ impl ASTTreeBuilder {
                 } else {
                     T::one()
                 };
-                self.new_node_alias(tree, NodeType::Atom(atom_name, operand), parent)?;
+                self.new_node_alias(tree, NodeType::Atom(atom_name, operand))?;
                 Ok(())
             }
             Rule::molecule => {
@@ -86,10 +84,10 @@ impl ASTTreeBuilder {
                 } else {
                     T::zero()
                 };
-                let nodeid =
-                    &self.new_node_alias(tree, NodeType::Molecule(prefix, charge), parent)?;
+                let index = self.new_node_alias(tree, NodeType::Molecule(prefix, charge))?;
                 for p in pairs {
-                    self.build_tree(p, tree, nodeid)?;
+                    tree.change_index(index);
+                    self.build_tree(p, tree)?;
                 }
                 Ok(())
             }
@@ -100,17 +98,19 @@ impl ASTTreeBuilder {
                 } else {
                     T::one()
                 };
-                let nodeid =
-                    &self.new_node_alias(tree, NodeType::ParenthesisWrapper(suffix), parent)?;
+                let index = self.new_node_alias(tree, NodeType::ParenthesisWrapper(suffix))?;
                 for p in pairs {
-                    self.build_tree(p, tree, nodeid)?;
+                    tree.change_index(index);
+                    self.build_tree(p, tree)?;
                 }
                 Ok(())
             }
             Rule::molecule_group => {
                 let pairs = pair.into_inner().collect::<Vec<_>>();
+                let index = tree.get_index();
                 for p in pairs {
-                    self.build_tree(p, tree, parent)?;
+                    tree.change_index(index);
+                    self.build_tree(p, tree)?;
                 }
                 Ok(())
             }
@@ -132,9 +132,8 @@ impl ASTTreeBuilder {
         &self,
         tree: &mut ASTTree<T>,
         nodetype: NodeType<T>,
-        parent: &NodeId,
-    ) -> Result<NodeId, ErrorCases> {
-        match tree.new_node(nodetype, &parent) {
+    ) -> Result<usize, ErrorCases> {
+        match tree.new_node(nodetype) {
             Ok(s) => Ok(s),
             Err(_) => Err(ErrorCases::ParserError("[AST] NodeId Error".to_string())),
         }

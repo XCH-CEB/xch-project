@@ -15,7 +15,7 @@
 
 // Overall: This is the source code of the AlphaForce Balancer.
 
-use crate::na::base::{Dynamic, MatrixMN};
+use nalgebra::base::{Dynamic, MatrixMN};
 use num::rational::Ratio;
 use std::vec::Vec;
 // inside uses
