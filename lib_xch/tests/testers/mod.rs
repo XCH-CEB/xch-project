@@ -36,9 +36,9 @@ where
     std::num::ParseIntError: std::convert::From<<T as num::Num>::FromStrRadixErr>
         + std::convert::From<<T as std::str::FromStr>::Err>,
 {
-    let tmp = match handler_api::<T>(payload) {
-        Ok(_) => panic!("Failed!"),
-        Err((e, _)) => e,
-    };
-    assert_eq!(tmp, *err);
+    if let Err((e, _)) = handler_api::<T>(payload) {
+        assert_eq!(e, *err);
+    } else {
+        panic!("Failed!"); // `handler_api::<T>` returned `Ok(_)`
+    }
 }
