@@ -19,20 +19,18 @@ lib_xch = "^0.11"
 # Example
 For more information, please read the source code of [xch-ceb](https://crates.io/crates/xch-ceb/)
 ```rust
-extern crate lib_xch;
-
-use lib_xch::api::handler::handler_api;
+use lib_xch::public::{handler::Handler, structs::ChemicalEquation};
 use std::io;
 
 fn main() {
-    let equation = input();
-    match handler_api::<i32>(&equation) {
+    print_about_info();
+    let equ = input();
+    match Handler::<i32>::new(&equ).handle() {
         Ok(s) => println!("{:?}", s),
-        Err((e, _)) => println!("{:?}", e),
+        Err(e) => println!("{}", e),
     };
 }
 
-// other functions
 fn input() -> String {
     println!("[INPUT] Input the equation:");
     let mut equation = String::new();

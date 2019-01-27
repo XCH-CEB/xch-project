@@ -1,6 +1,6 @@
 [package]
 name = "xch-ceb"
-version = "0.5.0"
+version = "0.5.1"
 authors = ["LEXUGE <LEXUGEyky@outlook.com>"]
 license = "GPL-3.0"
 description = "XCH - Chemical Equation Balancer"

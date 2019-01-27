@@ -15,7 +15,6 @@
 
 //! Failures which exposes to the public
 
-// extern crate(s)
 use failure::Fail;
 
 /// All the Error Types.

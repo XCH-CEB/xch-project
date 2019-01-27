@@ -1,6 +1,6 @@
 [package]
 name = "lib_xch"
-version = "0.12.0"
+version = "0.12.1"
 authors = ["LEXUGE <LEXUGEyky@outlook.com>"]
 description = "Crate xch-ceb's official lib"
 license = "GPL-3.0"

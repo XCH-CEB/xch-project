@@ -137,7 +137,9 @@ fn error() {
     tester_error::<i32>("AAA", &ParserError(" --> 1:4\n  |\n1 | AAA\n  |    ^---\n  |\n  = expected num, atom_name, electron, or parenthesis_wrapper".to_string()));
     tester_error::<i32>(
         "AAAA==",
-        &ParserError(" --> 1:6\n  |\n1 | AAAA==\n  |      ^---\n  |\n  = expected molecule".to_string()),
+        &ParserError(
+            " --> 1:6\n  |\n1 | AAAA==\n  |      ^---\n  |\n  = expected molecule".to_string(),
+        ),
     );
     tester_error::<i32>(
         "/A=A*",
