@@ -1,4 +1,4 @@
-// Copyright 2017-2018 LEXUGE
+// Copyright 2017-2019 LEXUGE
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,11 +17,11 @@
 
 use id_tree::{
     InsertBehavior::{AsRoot, UnderNode},
-    Node, NodeId, NodeIdError, Tree, TreeBuilder,
+    Node, NodeId, Tree, TreeBuilder,
 };
-// inside uses
-use super::{super::atomdict::AtomDict, node::ASTNode, node::NodeType};
-use crate::api::traits::CheckedType;
+// inside use(s)
+use super::{super::atomdict::AtomDict, node::ASTNode, node::NodeType, treebuilder::F};
+use crate::public::{failures::ErrorCases, traits::CheckedType};
 
 pub struct ASTTree<T: CheckedType> {
     tree: Tree<ASTNode<T>>,
@@ -52,17 +52,22 @@ impl<T: CheckedType> ASTTree<T> {
         self.index = index;
     }
 
-    pub fn new_node(&mut self, nodetype: NodeType<T>) -> Result<usize, NodeIdError> {
-        self.nodes.push(self.tree.insert(
-            Node::new(ASTNode::new(nodetype)),
-            UnderNode(&self.nodes[self.index]),
-        )?);
+    pub fn new_node(&mut self, nodetype: NodeType<T>) -> Result<usize, ErrorCases> {
+        self.nodes.push(
+            self.tree
+                .insert(
+                    Node::new(ASTNode::new(nodetype)),
+                    UnderNode(&self.nodes[self.index]),
+                )
+                .map_err(F)?,
+        );
         Ok(self.nodes.len() - 1)
     }
 
-    pub fn to_atomdict(&self) -> Result<AtomDict<T>, NodeIdError> {
+    pub fn to_atomdict(&self) -> Result<AtomDict<T>, ErrorCases> {
         self.tree
-            .get(&self.tree.root_node_id().unwrap())?
+            .get(&self.tree.root_node_id().unwrap())
+            .map_err(F)?
             .data()
             .to_atomdict(&self.tree.root_node_id().unwrap(), &self.tree)
     }

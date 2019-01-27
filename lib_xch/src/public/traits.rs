@@ -1,4 +1,4 @@
-// Copyright 2017-2018 LEXUGE
+// Copyright 2017-2019 LEXUGE
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ use num::{
     },
     Integer, Signed,
 };
-// inside uses
+// inside use(s)
 use std::{fmt::Display, marker::Copy, str::FromStr};
 
 // marcos for auto-creating implementations

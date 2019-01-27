@@ -1,4 +1,4 @@
-// Copyright 2017-2018 LEXUGE
+// Copyright 2017-2019 LEXUGE
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,9 +17,9 @@
 
 use nalgebra::base::{Dynamic, MatrixMN};
 use num::{rational::Ratio, One, Signed, Zero};
-// inside uses
-use crate::api::{
-    handler::{ErrorCases, ErrorCases::ZeroSolution},
+// inside use(s)
+use crate::public::{
+    failures::{ErrorCases, ErrorCases::ZeroSolution},
     traits::CheckedType,
 };
 

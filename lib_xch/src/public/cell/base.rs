@@ -1,4 +1,4 @@
-// Copyright 2017-2018 LEXUGE
+// Copyright 2017-2019 LEXUGE
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,9 +19,13 @@ use std::{
     ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, RemAssign, Sub, SubAssign},
 };
 // inside use(s)
-use super::Cell;
-use crate::api::traits::CheckedCalc;
-use crate::public::calc::{safe_calc, Operator};
+use super::{
+    super::{
+        calc::{safe_calc, Operator},
+        traits::CheckedCalc,
+    },
+    Cell,
+};
 
 // `Zero` and `One` impls
 impl<U: One + Zero + CheckedCalc> Zero for Cell<U> {

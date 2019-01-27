@@ -1,4 +1,4 @@
-// Copyright 2017-2018 LEXUGE
+// Copyright 2017-2019 LEXUGE
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,8 +15,7 @@
 
 use num::Signed;
 // inside use(s)
-use super::Cell;
-use crate::api::traits::CheckedCalc;
+use super::{super::traits::CheckedCalc, Cell};
 
 impl<U: Signed + CheckedCalc> Signed for Cell<U>
 where

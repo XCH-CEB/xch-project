@@ -1,4 +1,4 @@
-// Copyright 2017-2018 LEXUGE
+// Copyright 2017-2019 LEXUGE
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,17 +13,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+use crate::public::failures::ErrorCases;
 use num::traits::ops::checked::{
     CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg, CheckedRem, CheckedSub,
 };
-// inside uses
-use crate::api::{
-    handler::{
-        ErrorCases,
-        ErrorCases::{NegError, Overflow},
-    },
-    traits::CheckedCalc,
-};
+// inside use(s)
+use super::{failures::ErrorCases::Overflow, traits::CheckedCalc};
 
 // Operator
 pub enum Operator {
@@ -42,6 +37,6 @@ pub fn safe_calc<T: CheckedCalc>(a: &T, b: &T, op: &Operator) -> Result<T, Error
         Operator::Mul => CheckedMul::checked_mul(a, b).ok_or(Overflow),
         Operator::Div => CheckedDiv::checked_div(a, b).ok_or(Overflow),
         Operator::Rem => CheckedRem::checked_rem(a, b).ok_or(Overflow),
-        Operator::Neg => CheckedNeg::checked_neg(a).ok_or(NegError),
+        Operator::Neg => CheckedNeg::checked_neg(a).ok_or(Overflow),
     }
 }

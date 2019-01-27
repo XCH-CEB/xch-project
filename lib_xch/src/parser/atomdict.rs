@@ -1,4 +1,4 @@
-// Copyright 2017-2018 LEXUGE
+// Copyright 2017-2019 LEXUGE
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@ use std::{
     collections::HashMap,
     ops::{Add, AddAssign, Mul, MulAssign},
 };
-// inside uses
-use crate::api::traits::CheckedType;
+// inside use(s)
+use crate::public::traits::CheckedType;
 
 #[derive(Debug)]
 pub struct AtomDict<T: CheckedType> {

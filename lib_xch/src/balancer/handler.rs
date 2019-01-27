@@ -1,4 +1,4 @@
-// Copyright 2017-2018 LEXUGE
+// Copyright 2017-2019 LEXUGE
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,21 +18,19 @@
 use nalgebra::base::{Dynamic, MatrixMN};
 use num::rational::Ratio;
 use std::vec::Vec;
-// inside uses
-use super::maths::gauss_eliminate::GaussianElimination;
-use crate::api::{handler::ErrorCases, structs::ChemicalEquation, traits::CheckedType};
+// inside use(s)
+use super::maths::g_elim::GaussianElimination;
+use crate::public::{failures::ErrorCases, traits::CheckedType, types::DataSet};
 
-pub fn xch_balancer<T: CheckedType>(
-    list: &[Vec<T>],
-    ce_desc: &ChemicalEquation,
-) -> Result<Vec<Vec<T>>, ErrorCases> {
-    let v = list
+pub fn balancer<T: CheckedType>(ds: &DataSet<T>) -> Result<Vec<Vec<T>>, ErrorCases> {
+    let (cd, data) = ds;
+    let v = data
         .iter()
         .flat_map(|x| x)
         .map(|x| Ratio::<T>::from_integer(*x))
         .collect::<Vec<_>>();
     let equation_matrix =
-        MatrixMN::<Ratio<T>, Dynamic, Dynamic>::from_row_slice(list.len(), ce_desc.sum, &v[..]);
+        MatrixMN::<Ratio<T>, Dynamic, Dynamic>::from_row_slice(data.len(), cd.sum, &v[..]);
     let ans = GaussianElimination::<T>::new(equation_matrix).solve()?;
     let result = ans
         .into_iter()

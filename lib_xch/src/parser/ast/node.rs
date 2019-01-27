@@ -1,4 +1,4 @@
-// Copyright 2017-2018 LEXUGE
+// Copyright 2017-2019 LEXUGE
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,11 +15,12 @@
 
 // Overall: This is the source code of the Delta-3 Parser.
 
-use id_tree::{NodeId, NodeIdError, Tree};
-// inside uses
+use crate::public::failures::ErrorCases;
+use id_tree::{NodeId, Tree};
+// inside use(s)
 use self::NodeType::{Atom, Molecule, MoleculeGroup, ParenthesisWrapper};
-use super::super::atomdict::AtomDict;
-use crate::api::traits::CheckedType;
+use super::{super::atomdict::AtomDict, treebuilder::F};
+use crate::public::traits::CheckedType;
 
 pub enum NodeType<T: CheckedType> {
     Atom(String, T),       // `Symbol` and `Suffix_Operand`
@@ -41,7 +42,7 @@ impl<T: CheckedType> ASTNode<T> {
         &self,
         node_id: &NodeId,
         tree: &Tree<ASTNode<T>>,
-    ) -> Result<AtomDict<T>, NodeIdError> {
+    ) -> Result<AtomDict<T>, ErrorCases> {
         match &self.nodetype {
             Atom(s, o) => {
                 let mut a = AtomDict::<T>::new();
@@ -51,19 +52,19 @@ impl<T: CheckedType> ASTNode<T> {
             Molecule(o, c) => {
                 let mut a = AtomDict::<T>::new();
                 a.insert("e".to_string(), *c);
-                Ok(tree.children_ids(node_id)?.fold(a, |b, c| {
+                Ok(tree.children_ids(node_id).map_err(F)?.fold(a, |b, c| {
                     b + tree.get(c).unwrap().data().to_atomdict(c, tree).unwrap()
                 }) * *o)
             }
             ParenthesisWrapper(o) => {
                 let a = AtomDict::<T>::new();
-                Ok(tree.children_ids(node_id)?.fold(a, |b, c| {
+                Ok(tree.children_ids(node_id).map_err(F)?.fold(a, |b, c| {
                     b + tree.get(c).unwrap().data().to_atomdict(c, tree).unwrap()
                 }) * *o)
             }
             MoleculeGroup => {
                 let a = AtomDict::<T>::new();
-                Ok(tree.children_ids(node_id)?.fold(a, |b, c| {
+                Ok(tree.children_ids(node_id).map_err(F)?.fold(a, |b, c| {
                     b + tree.get(c).unwrap().data().to_atomdict(c, tree).unwrap()
                 }))
             }

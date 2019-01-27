@@ -1,4 +1,4 @@
-// Copyright 2017-2018 LEXUGE
+// Copyright 2017-2019 LEXUGE
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,5 +13,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-pub mod calc;
-pub mod cell;
+//! The module which provides a bunch of APIs.
+
+pub(crate) mod calc;
+pub(crate) mod cell;
+pub mod failures;
+pub mod handler;
+pub mod structs;
+pub mod traits;
+pub(crate) mod types;

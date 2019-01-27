@@ -1,4 +1,4 @@
-// Copyright 2017-2018 LEXUGE
+// Copyright 2017-2019 LEXUGE
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 // Overall: This is the source code of the Delta-3 Parser.
 
 use std::collections::HashMap;
-// inside uses
+// inside use(s)
 use super::atomdict::AtomDict;
-use crate::api::{handler::ErrorCases, traits::CheckedType};
+use crate::public::traits::CheckedType;
 
 // This is the data structure of describing the result of Delta-3 Parser.
 // This is the form of the `list`:
@@ -34,12 +34,7 @@ pub struct TableDesc<T: CheckedType> {
 }
 
 impl<T: CheckedType> TableDesc<T> {
-    pub fn store_in_table(
-        &mut self,
-        atomdict: &AtomDict<T>,
-        location: usize,
-        neg: bool,
-    ) -> Result<(), ErrorCases> {
+    pub fn store_in_table(&mut self, atomdict: &AtomDict<T>, location: usize, neg: bool) {
         for (k, v) in atomdict.get_dict().iter() {
             if !self.elements_table.contains_key(k) {
                 let len = self.elements_table.len();
@@ -50,7 +45,6 @@ impl<T: CheckedType> TableDesc<T> {
             let value = if neg { -(*v) } else { *v };
             self.list[self.elements_table[k]][location] += value;
         }
-        Ok(())
     }
 
     pub fn get_list(&self) -> Vec<Vec<T>> {

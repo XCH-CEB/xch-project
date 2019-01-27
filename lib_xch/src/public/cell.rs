@@ -1,4 +1,4 @@
-// Copyright 2017-2018 LEXUGE
+// Copyright 2017-2019 LEXUGE
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ mod signed;
 
 use std::cmp::Ordering;
 // inside use(s)
-use crate::api::traits::{CheckedCalc, CheckedType};
+use crate::public::traits::{CheckedCalc, CheckedType};
 
 #[derive(Copy, Clone, Debug)]
 pub struct Cell<U> {

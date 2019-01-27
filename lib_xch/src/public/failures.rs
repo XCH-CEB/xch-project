@@ -1,4 +1,4 @@
-// Copyright 2017-2018 LEXUGE
+// Copyright 2017-2019 LEXUGE
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,14 +13,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-//! Public structs
+//! Failures which exposes to the public
 
-/// Description of the chemical equation
-pub struct ChemicalEquation {
-    /// The number of the chemical formulas of the left side.
-    pub left: usize,
-    /// The number of the chemical formulas of the right side.
-    pub right: usize,
-    /// The sum of all the chemical formulas in the equation.
-    pub sum: usize,
+// extern crate(s)
+use failure::Fail;
+
+/// All the Error Types.
+#[derive(PartialEq, Fail, Debug)]
+pub enum ErrorCases {
+    /// Overflow.
+    #[fail(display = "Overflow occured during calculation")]
+    Overflow,
+    /// Parser's error with a message.
+    #[fail(display = "{}", _0)]
+    ParserError(String),
+    /// Only the [zero solution](http://www.mathwords.com/t/trivial.htm) can be found.
+    #[fail(display = "AlphaForce can only find trivial solution")]
+    ZeroSolution,
 }

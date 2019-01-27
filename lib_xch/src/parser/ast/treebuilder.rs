@@ -1,4 +1,4 @@
-// Copyright 2017-2018 LEXUGE
+// Copyright 2017-2019 LEXUGE
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,11 +15,16 @@
 
 // Overall: This is the source code of the Delta-3 Parser.
 
+use id_tree::NodeIdError;
 use pest::{iterators::Pair, Parser};
+use pest_derive::Parser;
 use std::str::FromStr;
-// inside uses
+// inside use(s)
 use super::{node::NodeType, tree::ASTTree};
-use crate::api::{handler::ErrorCases, traits::CheckedType};
+use crate::public::{failures::ErrorCases, traits::CheckedType};
+
+pub const F: fn(NodeIdError) -> ErrorCases =
+    |_| ErrorCases::ParserError("[Internal] [AST] NodeId Error".to_string());
 
 #[derive(Parser)]
 #[grammar = "ast.pest"]
@@ -34,10 +39,8 @@ impl ASTTreeBuilder {
 
     pub fn parse<T: CheckedType>(&self, formula: &str) -> Result<ASTTree<T>, ErrorCases> {
         let mut tree = ASTTree::<T>::new();
-        let pairs = match MoleculeParser::parse(Rule::molecule_group, formula) {
-            Ok(s) => s,
-            Err(e) => return Err(ErrorCases::ParserError(e.to_string())),
-        };
+        let pairs = MoleculeParser::parse(Rule::molecule_group, formula)
+            .map_err(|e| ErrorCases::ParserError(e.to_string()))?;
         for p in pairs {
             // The `pairs` only contains one Pair actually.
             self.build_tree(p, &mut tree)?
@@ -119,13 +122,8 @@ impl ASTTreeBuilder {
     }
 
     fn parse_from<T: FromStr>(&self, s: &str) -> Result<T, ErrorCases> {
-        match s.parse::<T>() {
-            Ok(s) => Ok(s),
-            Err(_) => Err(ErrorCases::ParserError(format!(
-                "{} '{}'",
-                "Can't parse", s
-            ))),
-        }
+        s.parse::<T>()
+            .map_err(|_| ErrorCases::ParserError(format!("Can't parse '{}'", s)))
     }
 
     fn new_node_alias<T: CheckedType>(
@@ -133,10 +131,7 @@ impl ASTTreeBuilder {
         tree: &mut ASTTree<T>,
         nodetype: NodeType<T>,
     ) -> Result<usize, ErrorCases> {
-        match tree.new_node(nodetype) {
-            Ok(s) => Ok(s),
-            Err(_) => Err(ErrorCases::ParserError("[AST] NodeId Error".to_string())),
-        }
+        Ok(tree.new_node(nodetype)?)
     }
 }
 

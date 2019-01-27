@@ -1,4 +1,4 @@
-// Copyright 2017-2018 LEXUGE
+// Copyright 2017-2019 LEXUGE
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,24 +15,21 @@
 
 // extern crate(s)
 
-use lib_xch::api::handler::handler_api;
-use lib_xch::api::handler::ErrorCases;
-use lib_xch::api::structs::ChemicalEquation;
+use lib_xch::public::{handler::Handler, structs::ChemicalEquation};
 use std::io;
 
 fn main() {
     print_about_info();
-    let equation = input();
-    match handler_api::<i32>(&equation) {
+    let equ = input();
+    match Handler::<i32>::new(&equ).handle() {
         Ok((c, v)) => print_ans(&c, &v),
-        Err((ErrorCases::ParserError(e), _)) => println!("{}", e),
-        Err((e, _)) => println!("{:?}", e),
+        Err(e) => println!("{}", e),
     };
 }
 
 // other functions
 fn print_about_info() {
-    println!("XCH  Copyright (C) 2017-2018  LEXUGE");
+    println!("XCH  Copyright (C) 2017-2019  LEXUGE");
     println!("This program comes with ABSOLUTELY NO WARRANTY;");
     println!("This is free software, and you are welcome to redistribute it");
     println!("under certain conditions;");

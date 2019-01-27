@@ -1,4 +1,4 @@
-// Copyright 2017-2018 LEXUGE
+// Copyright 2017-2019 LEXUGE
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,4 +15,4 @@
 
 // Overall: This is the source code of the Hyper Mathlib.
 
-pub mod gauss_eliminate;
+pub mod g_elim; // In case there will be more methods in the future

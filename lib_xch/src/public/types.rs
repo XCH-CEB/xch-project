@@ -1,4 +1,4 @@
-// Copyright 2017-2018 LEXUGE
+// Copyright 2019 LEXUGE
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,8 +13,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-//! The APIs
+// Public custom types
 
-pub mod handler;
-pub mod structs;
-pub mod traits;
+// inside use(s)
+use super::structs::ChemicalEquation;
+
+// type aliases
+pub type DataSet<T> = (ChemicalEquation, Vec<Vec<T>>);

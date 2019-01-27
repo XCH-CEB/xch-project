@@ -1,4 +1,4 @@
-// Copyright 2017-2018 LEXUGE
+// Copyright 2017-2019 LEXUGE
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,8 +15,9 @@
 
 mod testers;
 
+use lib_xch::public::failures::ErrorCases::{Overflow, ParserError, ZeroSolution};
+// inside use(s)
 use crate::testers::{tester, tester_error};
-use lib_xch::api::handler::ErrorCases::*;
 
 #[test]
 fn solve() {
