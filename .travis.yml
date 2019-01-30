@@ -13,3 +13,4 @@ script:
   - cargo build --verbose
   - cargo test --verbose
   - cargo clippy --verbose
+  - cargo bench --verbose

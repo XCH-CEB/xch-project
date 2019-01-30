@@ -66,28 +66,25 @@ where
     pub fn parse(&mut self) -> Result<DataSet<T>, ErrorCases> {
         self.ds = Some(parser::<Cell<T>>(self.equ)?);
         match self.ds.clone().unwrap() {
-            (cd, data) => Ok((cd, fromcell(&data)?)),
+            (cd, data) => Ok((cd, fromcell(data)?)),
         }
     }
 
     // AlphaForce Balancer
     fn balance(self) -> Result<Vec<Vec<T>>, ErrorCases> {
-        match balancer::<Cell<T>>(&self.ds.unwrap()) {
-            Ok(s) => Ok(fromcell(&s)?),
-            Err(e) => Err(e),
-        }
+        balancer::<Cell<T>>(&self.ds.unwrap()).and_then(fromcell)
     }
 }
 // All `false` => `true` (It didn't overflow)
-fn check_tag<T>(s: &[Vec<Cell<T>>]) -> bool {
-    s.iter().all(|x| x.iter().all(|x| !x.get_tag()))
+fn check_tag<T>(v: &[Vec<Cell<T>>]) -> bool {
+    v.iter().all(|x| x.iter().all(|x| !x.get_tag()))
 }
 
-fn fromcell<T: Clone>(s: &[Vec<Cell<T>>]) -> Result<Vec<Vec<T>>, ErrorCases> {
-    if !check_tag(s) {
+fn fromcell<T: Clone>(v: Vec<Vec<Cell<T>>>) -> Result<Vec<Vec<T>>, ErrorCases> {
+    if !check_tag(&v) {
         return Err(ErrorCases::Overflow);
     }
-    Ok(s.iter()
-        .map(|x| x.iter().map(|s| s.get_data()).collect::<Vec<_>>())
+    Ok(v.iter()
+        .map(|x| x.iter().map(|c| c.get_data()).collect::<Vec<_>>())
         .collect::<Vec<_>>())
 }

@@ -1,6 +1,6 @@
 [package]
 name = "lib_xch"
-version = "0.12.1"
+version = "0.12.2"
 authors = ["LEXUGE <LEXUGEyky@outlook.com>"]
 description = "Crate xch-ceb's official lib"
 license = "GPL-3.0"
@@ -18,3 +18,10 @@ nalgebra = "^0.16"
 id_tree = "^1.3"
 pest = "^2.0"
 pest_derive = "^2.0"
+
+[dev-dependencies]
+criterion = "^0.2"
+
+[[bench]]
+name = "benchmark"
+harness = false

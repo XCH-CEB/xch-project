@@ -37,12 +37,12 @@ fn print_about_info() {
 
 fn input() -> String {
     println!("[INPUT] Input the equation:");
-    let mut equation = String::new();
+    let mut equ = String::new();
     io::stdin()
-        .read_line(&mut equation)
+        .read_line(&mut equ)
         .expect("[ERROR] Failed to read line!");
-    equation.pop();
-    equation
+    equ.pop();
+    equ
 }
 
 fn print_ans(c: &ChemicalEquation, vecs: &[Vec<i32>]) {

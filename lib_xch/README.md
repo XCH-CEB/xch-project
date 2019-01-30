@@ -10,10 +10,10 @@ Swift, Small, Safe.
 
 # Getting Started
 First of all, you should pick a version.  
-At this time (2018.11), add following dependency to your `Cargo.toml`:  
+At this time (2019.1), add following dependency to your `Cargo.toml`:  
 ```
 [dependencies]
-lib_xch = "^0.11"
+lib_xch = "^0.12"
 ```  
 
 # Example
@@ -33,12 +33,12 @@ fn main() {
 
 fn input() -> String {
     println!("[INPUT] Input the equation:");
-    let mut equation = String::new();
+    let mut equ = String::new();
     io::stdin()
         .read_line(&mut equation)
         .expect("[ERROR] Failed to read line!");
-    equation.pop();
-    equation
+    equ.pop();
+    equ
 }
 
 ```
