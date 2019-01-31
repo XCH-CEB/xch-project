@@ -24,10 +24,12 @@ where
     std::num::ParseIntError: std::convert::From<<T as num::Num>::FromStrRadixErr>
         + std::convert::From<<T as std::str::FromStr>::Err>,
 {
-    let h = Handler::<T>::new(equ);
     assert_eq!(
-        match h.handle() {
-            Ok((_, v)) => v,
+        match Handler::<T>::new(equ).handle() {
+            Ok((_, v)) => v
+                .iter()
+                .map(|x| x.iter().map(|x| **x).collect::<Vec<_>>())
+                .collect::<Vec<_>>(),
             Err(e) => panic!(e),
         },
         v

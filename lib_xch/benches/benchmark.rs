@@ -19,7 +19,7 @@ use lib_xch::public::{
     traits::{CheckedCalc, CheckedType},
 };
 
-const EQU_1:&'static str = "H2+Ca(CN)2+NaAlF4+FeSO4+MgSiO3+KI+H3PO4+PbCrO4+BrCl+CF2Cl2+SO2=PbBr2+CrCl3+MgCO3+KAl(OH)4+Fe(SCN)3+PI3+Na2SiO3+CaF2+H2O";
+const EQU_1: &'static str = "H2+Ca(CN)2+NaAlF4+FeSO4+MgSiO3+KI+H3PO4+PbCrO4+BrCl+CF2Cl2+SO2=PbBr2+CrCl3+MgCO3+KAl(OH)4+Fe(SCN)3+PI3+Na2SiO3+CaF2+H2O";
 const EQU_2: &'static str = "NH4ClO4+HNO3+HCl=HClO4+N2O+Cl2+H2O";
 
 fn handle<T: CheckedType + CheckedCalc>(equ: &str)

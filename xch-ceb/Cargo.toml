@@ -11,4 +11,4 @@ edition = "2018"
 travis-ci = { repository = "XCH-CEB/xch-project" }
 
 [dependencies]
-lib_xch = { version="^0.12", path = "../lib_xch" }
+lib_xch = { version="^0.13", path = "../lib_xch" }

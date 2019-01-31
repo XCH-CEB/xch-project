@@ -307,7 +307,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "lib_xch"
-version = "0.12.2"
+version = "0.13.0"
 dependencies = [
  "criterion 0.2.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -767,7 +767,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 name = "xch-ceb"
 version = "0.5.1"
 dependencies = [
- "lib_xch 0.12.2",
+ "lib_xch 0.13.0",
 ]
 
 [metadata]

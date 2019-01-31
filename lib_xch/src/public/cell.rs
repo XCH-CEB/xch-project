@@ -43,11 +43,8 @@ impl<U> Cell<U> {
     pub fn get_tag(&self) -> bool {
         self.error_tag
     }
-}
-
-impl<U: Clone> Cell<U> {
-    pub fn get_data(&self) -> U {
-        self.data.clone()
+    pub fn get_data(&self) -> &U {
+        &self.data
     }
 }
 

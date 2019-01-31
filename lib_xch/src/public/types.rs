@@ -19,4 +19,5 @@
 use super::structs::ChemicalEquation;
 
 // type aliases
-pub type DataSet<T> = (ChemicalEquation, Vec<Vec<T>>);
+pub type DataSet<'a, T> = (&'a ChemicalEquation, Vec<Vec<T>>);
+pub(crate) type DataSetIn<'a, T> = (&'a ChemicalEquation, &'a Vec<Vec<T>>); // Use inside for less allocations

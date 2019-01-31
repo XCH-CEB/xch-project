@@ -45,7 +45,7 @@ fn input() -> String {
     equ
 }
 
-fn print_ans(c: &ChemicalEquation, vecs: &[Vec<i32>]) {
+fn print_ans(c: &ChemicalEquation, vecs: &[Vec<&i32>]) {
     println!("[OUTPUT]:");
     for i in 0..c.sum {
         let mut flag = false;

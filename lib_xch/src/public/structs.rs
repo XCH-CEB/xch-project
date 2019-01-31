@@ -26,3 +26,13 @@ pub struct ChemicalEquation {
     /// The sum of all the chemical formulas in the equation.
     pub sum: usize,
 }
+
+impl ChemicalEquation {
+    pub(crate) fn new() -> Self {
+        Self {
+            left: 0,
+            right: 0,
+            sum: 0,
+        }
+    }
+}

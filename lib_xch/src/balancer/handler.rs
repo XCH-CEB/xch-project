@@ -20,9 +20,9 @@ use num::rational::Ratio;
 use std::vec::Vec;
 // inside use(s)
 use super::maths::g_elim::GaussianElimination;
-use crate::public::{failures::ErrorCases, traits::CheckedType, types::DataSet};
+use crate::public::{failures::ErrorCases, traits::CheckedType, types::DataSetIn};
 
-pub fn balancer<T: CheckedType>(ds: &DataSet<T>) -> Result<Vec<Vec<T>>, ErrorCases> {
+pub fn balancer<T: CheckedType>(ds: DataSetIn<T>) -> Result<Vec<Vec<T>>, ErrorCases> {
     let (cd, data) = ds;
     let v = data
         .iter()

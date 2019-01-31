@@ -21,18 +21,24 @@
 //!  You can use any type which implemented the trait `api::traits::CheckedType`
 //!
 
+use std::collections::HashMap;
 // inside use(s)
 use super::{
     failures::ErrorCases,
     traits::{CheckedCalc, CheckedType},
     types::DataSet,
 };
-use crate::{balancer::handler::balancer, parser::handler::parser, public::cell::Cell};
+use crate::{
+    balancer::handler::balancer,
+    parser::handler::parser,
+    public::{cell::Cell, structs::ChemicalEquation},
+};
 
 /// A handler which store the equation and other information
 pub struct Handler<'a, T> {
     equ: &'a str,
-    ds: Option<DataSet<Cell<T>>>,
+    ds: HashMap<&'static str, Vec<Vec<Cell<T>>>>,
+    cd: ChemicalEquation,
 }
 
 impl<'a, T: CheckedType + CheckedCalc> Handler<'a, T>
@@ -42,7 +48,11 @@ where
 {
     /// Create a `Handler` by given equation
     pub fn new(equ: &'a str) -> Self {
-        Handler { equ, ds: None }
+        Handler {
+            equ,
+            ds: HashMap::new(),
+            cd: ChemicalEquation::new(),
+        }
     }
     /// Parse and balance the equation. If it has been parsed, then just balance it.
     ///
@@ -55,24 +65,30 @@ where
     /// -  A large number (bigger than [`usize::MAX`](https://doc.rust-lang.org/std/usize/constant.MAX.html)) of formula may cause **panic**. Because it is using `Vec`.
     ///
     /// And in the other failed situation, it'll return  `ErrorCases`.
-    pub fn handle(mut self) -> Result<DataSet<T>, ErrorCases> {
-        if self.ds.is_none() {
-            self.parse()?;
-        }
-        Ok((self.ds.clone().unwrap().0, self.balance()?))
+    pub fn handle(&mut self) -> Result<DataSet<&T>, ErrorCases> {
+        self.parse()?;
+        self.balance()?;
+        Ok((&self.cd, fromcell(&self.ds["Balancer"])?))
     }
 
     /// Parse the equation
-    pub fn parse(&mut self) -> Result<DataSet<T>, ErrorCases> {
-        self.ds = Some(parser::<Cell<T>>(self.equ)?);
-        match self.ds.clone().unwrap() {
-            (cd, data) => Ok((cd, fromcell(data)?)),
+    pub fn parse(&mut self) -> Result<DataSet<&T>, ErrorCases> {
+        match parser::<Cell<T>>(self.equ)? {
+            (cd, data) => {
+                self.cd = cd;
+                self.ds.insert("Parser", data);
+            }
         }
+        Ok((&self.cd, fromcell(&self.ds["Parser"])?))
     }
 
-    // AlphaForce Balancer
-    fn balance(self) -> Result<Vec<Vec<T>>, ErrorCases> {
-        balancer::<Cell<T>>(&self.ds.unwrap()).and_then(fromcell)
+    // Balance the equation
+    fn balance(&mut self) -> Result<(), ErrorCases> {
+        self.ds.insert(
+            "Balancer",
+            balancer::<Cell<T>>((&self.cd, &self.ds["Parser"]))?,
+        );
+        Ok(())
     }
 }
 // All `false` => `true` (It didn't overflow)
@@ -80,8 +96,8 @@ fn check_tag<T>(v: &[Vec<Cell<T>>]) -> bool {
     v.iter().all(|x| x.iter().all(|x| !x.get_tag()))
 }
 
-fn fromcell<T: Clone>(v: Vec<Vec<Cell<T>>>) -> Result<Vec<Vec<T>>, ErrorCases> {
-    if !check_tag(&v) {
+fn fromcell<T>(v: &[Vec<Cell<T>>]) -> Result<Vec<Vec<&T>>, ErrorCases> {
+    if !check_tag(v) {
         return Err(ErrorCases::Overflow);
     }
     Ok(v.iter()
