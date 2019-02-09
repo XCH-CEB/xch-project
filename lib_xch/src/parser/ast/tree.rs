@@ -35,7 +35,7 @@ impl<T: CheckedType> ASTTree<T> {
         let mut nodes: Vec<NodeId> = Vec::new();
         nodes.push(
             tree.insert(Node::new(ASTNode::new(NodeType::MoleculeGroup)), AsRoot)
-                .unwrap(), // By using `AsRoot`, it always return `Ok(_)`, so it's safe.
+                .unwrap(), // By using `AsRoot`, it always returns `Ok(_)`, so it's safe.
         );
         Self {
             tree,
