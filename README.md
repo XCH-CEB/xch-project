@@ -20,3 +20,4 @@ Licensed under GPL-3.0
 - [x] Provides the set of Basic Solutions
 - [x] Uses AST-based parser
 - [x] Supports WebAssembly
+- [ ] Supports different kinds of I/O styles.

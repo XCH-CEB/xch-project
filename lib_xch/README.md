@@ -10,10 +10,10 @@ Swift, Small, Safe.
 
 # Getting Started
 First of all, you should pick a version.  
-At this time (2019.1), add following dependency to your `Cargo.toml`:  
+At this time (2019.2), add following dependency to your `Cargo.toml`:  
 ```
 [dependencies]
-lib_xch = "^0.12"
+lib_xch = "^0.13"
 ```  
 
 # Example
