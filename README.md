@@ -1,5 +1,6 @@
 # XCH Project
-![Screenshot](Screenshot.png)  
+![Screenshot](Screenshot.png) [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FXCH-CEB%2Fxch-project.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FXCH-CEB%2Fxch-project?ref=badge_shield)
+ 
 [![Build Status](https://travis-ci.org/XCH-CEB/xch-project.svg?branch=master)](https://travis-ci.org/XCH-CEB/xch-project)  
 
 This is XCH Project.  
@@ -13,6 +14,9 @@ Swift, Small, Safe.
 
 # License
 Licensed under GPL-3.0  
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FXCH-CEB%2Fxch-project.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FXCH-CEB%2Fxch-project?ref=badge_large)
 
 # Plans
 - [x] Uses regex-based parser
