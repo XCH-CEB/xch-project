@@ -14,10 +14,10 @@ travis-ci = { repository = "XCH-CEB/xch-project" }
 [dependencies]
 failure = "^0.1"
 num = "^0.2"
-nalgebra = "^0.16"
-id_tree = "^1.3"
-pest = "^2.0"
-pest_derive = "^2.0"
+nalgebra = "^0.18"
+id_tree = "^1.5"
+pest = "^2.1"
+pest_derive = "^2.1"
 
 [dev-dependencies]
 criterion = "^0.2"
