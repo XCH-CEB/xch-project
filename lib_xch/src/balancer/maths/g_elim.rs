@@ -80,7 +80,7 @@ impl<T: CheckedType> GaussianElimination<T> {
             }
         } // RREF
         let v = (0..self.n)
-            .filter(|i| self.matrix_a.row(*i).iter().all(|e| e.is_zero()))
+            .filter(|i| self.matrix_a.row(*i).iter().all(Zero::is_zero))
             .collect::<Vec<_>>();
         self = self.simplify(v); // eliminate the zero rows
         var_table = (0..self.m)

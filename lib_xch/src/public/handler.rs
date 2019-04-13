@@ -101,6 +101,6 @@ fn fromcell<T>(v: &[Vec<Cell<T>>]) -> Result<Vec<Vec<&T>>, ErrorCases> {
         return Err(ErrorCases::Overflow);
     }
     Ok(v.iter()
-        .map(|x| x.iter().map(|c| c.get_data()).collect::<Vec<_>>())
+        .map(|x| x.iter().map(Cell::get_data).collect::<Vec<_>>())
         .collect::<Vec<_>>())
 }
