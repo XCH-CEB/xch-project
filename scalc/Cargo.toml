@@ -1,0 +1,15 @@
+[package]
+name = "scalc"
+version = "0.1.0"
+authors = ["Harry Ying <LEXUGEyky@outlook.com>"]
+edition = "2018"
+license = "GPL-3.0"
+description = "A type that ensures calculation safety and prevents itself from overflow"
+repository = "https://github.com/XCH-CEB/xch-project"
+readme = "README.md"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+num-traits = "^0.2"
+paste = "^0.1"

@@ -3,4 +3,5 @@
 members = [
     "lib_xch",
     "xch-ceb",
+    "scalc",
 ]
