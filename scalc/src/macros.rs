@@ -30,7 +30,7 @@ macro_rules! ops {
         paste::item! {
             impl<T: num_traits::One + num_traits::[<Checked $trait>]> std::ops::[<$trait Assign>] for SCell<T> {
                 fn [<$fn _assign>](&mut self, rhs: Self) {
-                 self.data = self.data.[<checked_ $fn>](&rhs.data).unwrap_or_else(|| {self.error_tag = true; T::one()});
+                    self.data = self.data.[<checked_ $fn>](&rhs.data).unwrap_or_else(|| {self.error_tag = true; T::one()});
                     self.error_tag |= rhs.error_tag;
                 }
             }
