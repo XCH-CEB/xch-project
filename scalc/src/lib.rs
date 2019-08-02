@@ -25,7 +25,7 @@
 //!
 //!    // Addition will result in `None` in the presence of overflow behavior(s)
 //!    let a = SCell::<i32>::new(std::i32::MAX) + SCell::<i32>::new(1);
-//!    assert_eq!(a.is_none(), true);
+//!    assert!(a.is_none());
 //!    Ok(())
 //! }
 //! ```
@@ -51,30 +51,36 @@ mod tests {
     #[test]
     fn overflow_add() {
         let a = SCell::<i32>::new(std::i32::MAX) + SCell::<i32>::new(1);
-        assert_eq!(a.is_none(), true);
+        assert!(a.is_none());
     }
 
     #[test]
     fn overflow_sub() {
         let a = SCell::<i32>::new(std::i32::MIN) - SCell::<i32>::new(1);
-        assert_eq!(a.is_none(), true);
+        assert!(a.is_none());
     }
 
     #[test]
     fn overflow_mul() {
         let a = SCell::<i32>::new(std::i32::MAX) * SCell::<i32>::new(2);
-        assert_eq!(a.is_none(), true);
+        assert!(a.is_none());
     }
 
     #[test]
     fn overflow_div() {
         let a = SCell::<i32>::new(std::i32::MIN) / SCell::<i32>::new(-1);
-        assert_eq!(a.is_none(), true);
+        assert!(a.is_none());
     }
 
     #[test]
     fn overflow_abs() {
         let a = SCell::<i32>::new(std::i32::MIN).abs();
-        assert_eq!(a.is_none(), true);
+        assert!(a.is_none());
+    }
+
+    #[test]
+    fn test_fromstr() {
+        let a = "2184".parse::<SCell<i32>>().unwrap();
+        assert_eq!(a, SCell::<i32>::new(2184));
     }
 }

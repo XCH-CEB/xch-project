@@ -21,6 +21,6 @@ fn main() -> Result<(), String> {
 
     // Addition will result in `None` in the presence of overflow behavior(s)
     let a = SCell::<i32>::new(std::i32::MAX) + SCell::<i32>::new(1);
-    assert_eq!(a.is_none(), true);
+    assert!(a.is_none());
     Ok(())
 }

@@ -15,21 +15,19 @@
 
 macro_rules! ops {
     (neg) => {
-        impl<T: num_traits::One + num_traits::CheckedNeg> std::ops::Neg for SCell<T> {
+        impl<T: num_traits::CheckedNeg> std::ops::Neg for SCell<T> {
             type Output = Option<Self>;
             fn neg(self) -> Self::Output {
-                self.data
-                    .checked_neg()
-                    .map_or(None, |x| Some(SCell { data: x }))
+                self.data.checked_neg().map(SCell::new)
             }
         }
     };
     ($op: tt, $fn: ident, $trait: ident) => {
         paste::item! {
-            impl<T: One + num_traits::[<Checked $trait>]> $trait for SCell<T> {
+            impl<T: num_traits::[<Checked $trait>]> $trait for SCell<T> {
                 type Output = Option<Self>;
                 fn $fn(self, rhs: Self) -> Self::Output {
-                    self.data.[<checked_ $fn>](&rhs.data).map_or(None, |x| Some(SCell { data: x }))
+                    self.data.[<checked_ $fn>](&rhs.data).map(SCell::new)
                 }
             }
         }

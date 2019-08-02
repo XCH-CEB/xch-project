@@ -20,7 +20,10 @@ use {
         CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg, CheckedRem, CheckedSub, Num, One, Signed,
         Zero,
     },
-    std::ops::{Add, Div, Mul, Rem, Sub},
+    std::{
+        ops::{Add, Div, Mul, Not, Rem, Sub},
+        str::FromStr,
+    },
 };
 
 // Basic implementations
@@ -39,7 +42,7 @@ impl<T> SCell<T> {
 impl<T: Zero> SCell<T> {
     /// See `num` crate for more information
     pub fn zero() -> Self {
-        SCell { data: T::zero() }
+        SCell::new(T::zero())
     }
     /// See `num` crate for more information
     pub fn is_zero(&self) -> bool {
@@ -49,7 +52,7 @@ impl<T: Zero> SCell<T> {
 impl<T: One + PartialEq> SCell<T> {
     /// See `num` crate for more information
     pub fn one() -> Self {
-        SCell { data: T::one() }
+        SCell::new(T::one())
     }
     /// See `num` crate for more information
     pub fn is_one(&self) -> bool {
@@ -116,5 +119,21 @@ impl<
     /// See `num` crate for more information
     pub fn is_negative(&self) -> bool {
         self.data.is_negative()
+    }
+}
+
+// Implementation of `FromStr`
+impl<T: FromStr> FromStr for SCell<T> {
+    type Err = T::Err;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(SCell::new(T::from_str(s)?))
+    }
+}
+
+// Implementation of `Not`
+impl<T: Not> Not for SCell<T> {
+    type Output = SCell<T::Output>;
+    fn not(self) -> Self::Output {
+        SCell::new(!self.data)
     }
 }
