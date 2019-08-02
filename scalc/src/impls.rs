@@ -20,25 +20,14 @@ use {
         CheckedAdd, CheckedDiv, CheckedMul, CheckedNeg, CheckedRem, CheckedSub, Num, One, Signed,
         Zero,
     },
-    std::{
-        cmp::Ordering,
-        ops::{Add, Div, Mul, Rem, Sub},
-    },
+    std::ops::{Add, Div, Mul, Rem, Sub},
 };
 
 // Basic implementations
 impl<T> SCell<T> {
     /// Create a new `SCell`
     pub fn new(data: T) -> Self {
-        SCell {
-            error_tag: false,
-            data,
-        }
-    }
-    /// Get the status which denotes that whether it's overflowed or not  
-    /// `true` for overflowed and `false` for normal status
-    pub fn is_overflowed(&self) -> bool {
-        self.error_tag
+        SCell { data }
     }
     /// Get the data of underlying type `T`
     pub fn get_data(&self) -> &T {
@@ -46,47 +35,24 @@ impl<T> SCell<T> {
     }
 }
 
-// Implementations of `Eq`, `PartialEq`, `Ord`, `PartialOrd`
-impl<T: PartialEq> PartialEq for SCell<T> {
-    fn eq(&self, other: &Self) -> bool {
-        self.data == other.data
+// Implementations of methods which are given in `One` and `Zero`
+impl<T: Zero> SCell<T> {
+    /// See `num` crate for more information
+    pub fn zero() -> Self {
+        SCell { data: T::zero() }
     }
-}
-
-impl<T: PartialEq> Eq for SCell<T> {}
-
-impl<T: PartialOrd + Ord> Ord for SCell<T> {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.data.cmp(&other.data)
-    }
-}
-
-impl<T: PartialEq + Ord> PartialOrd for SCell<T> {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(&other))
-    }
-}
-
-// Implementations of `One` and `Zero`
-impl<T: Zero + One + CheckedAdd> Zero for SCell<T> {
-    fn zero() -> Self {
-        SCell {
-            error_tag: false,
-            data: T::zero(),
-        }
-    }
-    fn is_zero(&self) -> bool {
+    /// See `num` crate for more information
+    pub fn is_zero(&self) -> bool {
         self.data.is_zero()
     }
 }
-impl<T: One + CheckedMul + PartialEq> One for SCell<T> {
-    fn one() -> Self {
-        SCell {
-            error_tag: false,
-            data: T::one(),
-        }
+impl<T: One + PartialEq> SCell<T> {
+    /// See `num` crate for more information
+    pub fn one() -> Self {
+        SCell { data: T::one() }
     }
-    fn is_one(&self) -> bool {
+    /// See `num` crate for more information
+    pub fn is_one(&self) -> bool {
         self.data.is_one()
     }
 }
@@ -99,19 +65,16 @@ ops!(/=, div, Div);
 ops!(%=, rem, Rem);
 ops!(neg);
 
-// Implementation of `Num`
-impl<T: Num + CheckedAdd + CheckedSub + CheckedMul + CheckedDiv + CheckedRem> Num for SCell<T> {
-    type FromStrRadixErr = T::FromStrRadixErr;
-    fn from_str_radix(str: &str, radix: u32) -> Result<Self, Self::FromStrRadixErr> {
+// Implementation of method which is given in `Num`
+impl<T: Num + CheckedAdd + CheckedSub + CheckedMul + CheckedDiv + CheckedRem> SCell<T> {
+    /// See `num` crate for more information
+    pub fn from_str_radix(str: &str, radix: u32) -> Result<Self, T::FromStrRadixErr> {
         let data = T::from_str_radix(str, radix)?;
-        Ok(SCell {
-            error_tag: false,
-            data,
-        })
+        Ok(SCell { data })
     }
 }
 
-// Implementation of `Signed`
+// Implementation of methods which are given in `Signed`
 impl<
         T: Signed
             + CheckedAdd
@@ -122,32 +85,36 @@ impl<
             + CheckedNeg
             + Ord
             + Copy,
-    > Signed for SCell<T>
+    > SCell<T>
 {
-    fn abs(&self) -> Self {
+    /// See `num` crate for more information
+    pub fn abs(&self) -> Option<Self> {
         if *self < Self::zero() {
             -*self
         } else {
-            *self
+            Some(*self)
         }
     }
-    fn abs_sub(&self, other: &Self) -> Self {
+    /// See `num` crate for more information
+    pub fn abs_sub(&self, other: &Self) -> Option<Self> {
         if *self <= *other {
-            Self::zero()
+            Some(Self::zero())
         } else {
             *self - *other
         }
     }
-    fn signum(&self) -> Self {
+    /// See `num` crate for more information
+    pub fn signum(&self) -> Self {
         SCell {
-            error_tag: self.error_tag,
             data: self.data.signum(),
         }
     }
-    fn is_positive(&self) -> bool {
+    /// See `num` crate for more information
+    pub fn is_positive(&self) -> bool {
         self.data.is_positive()
     }
-    fn is_negative(&self) -> bool {
+    /// See `num` crate for more information
+    pub fn is_negative(&self) -> bool {
         self.data.is_negative()
     }
 }

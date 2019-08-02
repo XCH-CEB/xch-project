@@ -15,12 +15,12 @@
 
 use scalc::SCell;
 
-fn main() {
+fn main() -> Result<(), String> {
     let a = SCell::<i32>::new(12) * SCell::<i32>::new(3);
-    assert_eq!(*a.get_data(), 36);
+    assert_eq!(*a.ok_or("overflow")?.get_data(), 36);
 
-    // `error_tag` will be `true` in the presence of overflow behavior(s)
+    // Addition will result in `None` in the presence of overflow behavior(s)
     let a = SCell::<i32>::new(std::i32::MAX) + SCell::<i32>::new(1);
-    assert_eq!(a.is_overflowed(), true);
-    assert_eq!(*a.get_data(), 1);
+    assert_eq!(a.is_none(), true);
+    Ok(())
 }
